@@ -1,0 +1,2 @@
+admin,admin123
+manager1,pass123
