@@ -1,0 +1,4 @@
+V001,Toyota,Corolla,35.0,AVAILABLE
+V002,Hyundai,Elantra,40.0,RENTED
+V003,Kia,Sportage,55.0,AVAILABLE
+V004,Ford,Transit,70.0,UNAVAILABLE
