@@ -162,20 +162,8 @@ public class MainFrame extends JFrame {
         contentPanel.add(new DashboardPanel(appContext), DASHBOARD);
         contentPanel.add(new VehicleCatalogPanel(appContext), VEHICLES);
         contentPanel.add(new RentalPanel(appContext), RENTALS);
-        contentPanel.add(
-                new PlaceholderPanel(
-                        "Returns Management",
-                        "Sprint 4 will be added here: return vehicle and close rental records."
-                ),
-                RETURNS
-        );
-        contentPanel.add(
-                new PlaceholderPanel(
-                        "Billing",
-                        "Sprint 4 and Sprint 5 billing, penalties, and type-specific pricing will be added here."
-                ),
-                BILLING
-        );
+        contentPanel.add(new ReturnPanel(appContext), RETURNS);
+        contentPanel.add(new BillingPanel(appContext), BILLING);
 
         mainArea.add(header, BorderLayout.NORTH);
         mainArea.add(contentPanel, BorderLayout.CENTER);
@@ -202,19 +190,19 @@ public class MainFrame extends JFrame {
     private void updateHeader(String pageKey) {
         if (DASHBOARD.equals(pageKey)) {
             pageTitle.setText("Dashboard");
-            pageSubtitle.setText("Sprint 2 GUI overview and system status.");
+            pageSubtitle.setText("Sprint 4 GUI overview and system status.");
         } else if (VEHICLES.equals(pageKey)) {
             pageTitle.setText("Vehicle Catalog");
             pageSubtitle.setText("Available vehicles are displayed with the updated blue and gold interface.");
         } else if (RENTALS.equals(pageKey)) {
             pageTitle.setText("Rent Vehicle");
-            pageSubtitle.setText("Prepared for Sprint 2 rental operations.");
+            pageSubtitle.setText("Create rentals and prevent double booking.");
         } else if (RETURNS.equals(pageKey)) {
             pageTitle.setText("Returns");
-            pageSubtitle.setText("Prepared for Sprint 4 return operations.");
+            pageSubtitle.setText("Return vehicles and close active rentals.");
         } else if (BILLING.equals(pageKey)) {
             pageTitle.setText("Billing");
-            pageSubtitle.setText("Prepared for rental cost and late penalty screens.");
+            pageSubtitle.setText("Calculate rental cost and late return penalties.");
         }
     }
 

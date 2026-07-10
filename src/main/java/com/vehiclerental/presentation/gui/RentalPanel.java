@@ -27,6 +27,7 @@ public class RentalPanel extends JPanel {
     private final VehicleTableModel vehicleTableModel;
     private final JTable vehicleTable;
     private final JTextField customerNameField;
+    private final JTextField customerEmailField;
     private final JTextField startDateField;
     private final JTextField endDateField;
     private final JLabel statusLabel;
@@ -36,6 +37,7 @@ public class RentalPanel extends JPanel {
         this.vehicleTableModel = new VehicleTableModel();
         this.vehicleTable = new JTable(vehicleTableModel);
         this.customerNameField = new JTextField(18);
+        this.customerEmailField = new JTextField(18);
         this.startDateField = new JTextField(12);
         this.endDateField = new JTextField(12);
         this.statusLabel = UiTheme.subtitleLabel("Select an available vehicle and enter rental details.");
@@ -45,6 +47,7 @@ public class RentalPanel extends JPanel {
 
         UiTheme.styleTable(vehicleTable);
         UiTheme.styleTextField(customerNameField);
+        UiTheme.styleTextField(customerEmailField);
         UiTheme.styleTextField(startDateField);
         UiTheme.styleTextField(endDateField);
 
@@ -61,15 +64,17 @@ public class RentalPanel extends JPanel {
         JPanel card = UiTheme.cardPanel();
         card.setLayout(new BorderLayout(12, 12));
 
-        JPanel fieldsPanel = new JPanel(new GridLayout(2, 4, 10, 10));
+        JPanel fieldsPanel = new JPanel(new GridLayout(2, 5, 10, 10));
         fieldsPanel.setBackground(UiTheme.SURFACE);
 
         fieldsPanel.add(new JLabel("Customer Name"));
+        fieldsPanel.add(new JLabel("Customer Email"));
         fieldsPanel.add(new JLabel("Start Date"));
         fieldsPanel.add(new JLabel("End Date"));
         fieldsPanel.add(new JLabel(""));
 
         fieldsPanel.add(customerNameField);
+        fieldsPanel.add(customerEmailField);
         fieldsPanel.add(startDateField);
         fieldsPanel.add(endDateField);
 
@@ -133,6 +138,13 @@ public class RentalPanel extends JPanel {
             return;
         }
 
+        String customerEmail = customerEmailField.getText().trim();
+
+        if (customerEmail.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter the customer email.", "Missing Email", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         LocalDate startDate;
         LocalDate endDate;
 
@@ -155,20 +167,45 @@ public class RentalPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Rental duration cannot exceed " + MAX_RENTAL_DAYS + " days.", "Invalid Rental Period", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        try {
+            com.vehiclerental.domain.Rental rental =
+                    appContext.getRentalService().rentVehicle(
+                            selectedVehicle.getId(),
+                            customerName,
+                            customerEmail,
+                            startDate,
+                            endDate
+                    );
 
-        double estimatedCost = rentalDays * selectedVehicle.getDailyRate();
+            double estimatedCost =
+                    appContext.getBillingService().calculateBaseCost(rental);
 
-        JOptionPane.showMessageDialog(
-                this,
-                "GUI is ready for Sprint 2 service.\n\n" +
-                        "Vehicle: " + selectedVehicle.getId() + " - " + selectedVehicle.getBrand() + " " + selectedVehicle.getModel() + "\n" +
-                        "Customer: " + customerName + "\n" +
-                        "Duration: " + rentalDays + " day(s)\n" +
-                        "Estimated Cost: " + estimatedCost + "\n\n" +
-                        "When RentalService is ready, connect it inside prepareRental().",
-                "Rental Prepared",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Rental created successfully.\n\n"
+                            + "Rental ID: " + rental.getId() + "\n"
+                            + "Vehicle: " + rental.getVehicle().getId() + "\n"
+                            + "Customer: " + rental.getCustomerName() + "\n"
+                            + "Email: " + rental.getCustomerEmail() + "\n"
+                            + "Start Date: " + rental.getStartDate() + "\n"
+                            + "End Date: " + rental.getEndDate() + "\n"
+                            + "Estimated Cost: " + estimatedCost,
+                    "Rental Created",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            customerNameField.setText("");
+            customerEmailField.setText("");
+            loadAvailableVehicles();
+
+        } catch (RuntimeException exception) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    exception.getMessage(),
+                    "Rental Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     private Vehicle getSelectedVehicle() {
