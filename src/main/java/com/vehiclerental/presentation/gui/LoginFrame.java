@@ -53,13 +53,13 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(0, 38, 8, 38);
 
         JLabel title = new JLabel("Vehicle Rental");
-        title.setForeground(Color.WHITE);
+        title.setForeground(UiTheme.PRIMARY_LIGHT);
         title.setFont(new Font("SansSerif", Font.BOLD, 32));
         panel.add(title, gbc);
 
         gbc.gridy++;
         JLabel subtitle = new JLabel("Management System");
-        subtitle.setForeground(new Color(195, 205, 225));
+        subtitle.setForeground(UiTheme.MUTED);
         subtitle.setFont(new Font("SansSerif", Font.PLAIN, 19));
         panel.add(subtitle, gbc);
 
@@ -68,7 +68,7 @@ public class LoginFrame extends JFrame {
         JLabel sprint = new JLabel("Sprint 1 Ready");
         sprint.setOpaque(true);
         sprint.setBackground(UiTheme.PRIMARY);
-        sprint.setForeground(Color.WHITE);
+        sprint.setForeground(Color.BLACK);
         sprint.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
         sprint.setFont(new Font("SansSerif", Font.BOLD, 14));
         panel.add(sprint, gbc);
@@ -76,7 +76,7 @@ public class LoginFrame extends JFrame {
         gbc.gridy++;
         gbc.insets = new Insets(16, 38, 0, 38);
         JLabel details = new JLabel("Login, logout, and available vehicle catalog.");
-        details.setForeground(new Color(195, 205, 225));
+        details.setForeground(UiTheme.MUTED);
         details.setFont(new Font("SansSerif", Font.PLAIN, 13));
         panel.add(details, gbc);
 

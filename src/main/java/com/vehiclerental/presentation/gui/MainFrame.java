@@ -5,9 +5,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -39,6 +39,8 @@ public class MainFrame extends JFrame {
         this.pageSubtitle = new JLabel();
         this.menuButtons = new LinkedHashMap<>();
 
+        UiTheme.applyGlobalTheme();
+
         setTitle("Vehicle Rental Management System");
         setSize(1180, 720);
         setMinimumSize(new Dimension(1020, 620));
@@ -55,73 +57,125 @@ public class MainFrame extends JFrame {
 
     private JPanel createSidebar() {
         JPanel sidebar = new JPanel(new BorderLayout());
-        sidebar.setPreferredSize(new Dimension(245, 720));
+        sidebar.setPreferredSize(new Dimension(285, 720));
         sidebar.setBackground(UiTheme.SIDEBAR);
+        sidebar.setOpaque(true);
 
-        JLabel logo = new JLabel("  Vehicle Rental");
-        logo.setForeground(Color.WHITE);
-        logo.setFont(new Font("SansSerif", Font.BOLD, 20));
-        logo.setBorder(BorderFactory.createEmptyBorder(26, 14, 26, 14));
-        sidebar.add(logo, BorderLayout.NORTH);
+        sidebar.add(createBrandPanel(), BorderLayout.NORTH);
 
-        JPanel menu = new JPanel(new GridLayout(8, 1, 0, 2));
+        JPanel menu = new JPanel(new GridLayout(8, 1, 0, 8));
         menu.setBackground(UiTheme.SIDEBAR);
-        menu.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+        menu.setOpaque(true);
+        menu.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
 
-        addMenuButton(menu, DASHBOARD, "Dashboard");
-        addMenuButton(menu, VEHICLES, "Vehicle Catalog");
-        addMenuButton(menu, RENTALS, "Rent Vehicle");
-        addMenuButton(menu, RETURNS, "Returns");
-        addMenuButton(menu, BILLING, "Billing");
+        addMenuButton(menu, DASHBOARD, "  Dashboard");
+        addMenuButton(menu, VEHICLES, "  Vehicle Catalog");
+        addMenuButton(menu, RENTALS, "  Rent Vehicle");
+        addMenuButton(menu, RETURNS, "  Returns");
+        addMenuButton(menu, BILLING, "  Billing");
 
         sidebar.add(menu, BorderLayout.CENTER);
 
-        JButton logoutButton = new JButton("Logout");
+        JButton logoutButton = new JButton("  Logout");
         UiTheme.styleSidebarButton(logoutButton);
+        logoutButton.setHorizontalAlignment(SwingConstants.LEFT);
         logoutButton.addActionListener(e -> application.logout(this));
 
         JPanel footer = new JPanel(new BorderLayout());
         footer.setBackground(UiTheme.SIDEBAR);
-        footer.setBorder(BorderFactory.createEmptyBorder(10, 10, 18, 10));
+        footer.setOpaque(true);
+        footer.setBorder(BorderFactory.createEmptyBorder(10, 14, 20, 14));
         footer.add(logoutButton, BorderLayout.CENTER);
+
         sidebar.add(footer, BorderLayout.SOUTH);
 
         return sidebar;
     }
 
+    private JPanel createBrandPanel() {
+        JPanel brandPanel = new JPanel(new BorderLayout(0, 10));
+        brandPanel.setBackground(UiTheme.SIDEBAR);
+        brandPanel.setOpaque(true);
+        brandPanel.setBorder(BorderFactory.createEmptyBorder(18, 14, 14, 14));
+
+        JLabel logoLabel = UiTheme.logoImageLabel("/images/vehicle-rental-logo.png", 250, 84);
+
+        JPanel logoWrapper = new JPanel(new BorderLayout());
+        logoWrapper.setBackground(UiTheme.SIDEBAR);
+        logoWrapper.setOpaque(true);
+        logoWrapper.add(logoLabel, BorderLayout.CENTER);
+
+        JLabel title = new JLabel("Vehicle Rental");
+        UiTheme.styleLabelAsBrand(title);
+
+        JLabel subtitle = new JLabel("Management System");
+        UiTheme.styleMutedLabel(subtitle);
+
+        JPanel textPanel = new JPanel(new BorderLayout(0, 3));
+        textPanel.setBackground(UiTheme.SIDEBAR);
+        textPanel.setOpaque(true);
+        textPanel.add(title, BorderLayout.NORTH);
+        textPanel.add(subtitle, BorderLayout.CENTER);
+
+        brandPanel.add(logoWrapper, BorderLayout.NORTH);
+        brandPanel.add(textPanel, BorderLayout.CENTER);
+
+        return brandPanel;
+    }
+
     private JPanel createMainArea() {
         JPanel mainArea = new JPanel(new BorderLayout());
         mainArea.setBackground(UiTheme.BACKGROUND);
+        mainArea.setOpaque(true);
 
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(UiTheme.BACKGROUND);
+        header.setOpaque(true);
         header.setBorder(BorderFactory.createEmptyBorder(24, 28, 16, 28));
 
         JPanel titles = new JPanel(new GridLayout(2, 1));
         titles.setBackground(UiTheme.BACKGROUND);
+        titles.setOpaque(true);
 
         pageTitle.setFont(new Font("SansSerif", Font.BOLD, 26));
         pageTitle.setForeground(UiTheme.TEXT);
+
         pageSubtitle.setFont(new Font("SansSerif", Font.PLAIN, 13));
         pageSubtitle.setForeground(UiTheme.MUTED);
 
         titles.add(pageTitle);
         titles.add(pageSubtitle);
 
-        JLabel userLabel = new JLabel("Logged in as: " + appContext.getAuthenticationService().getLoggedInManager().getUsername());
+        JLabel userLabel = new JLabel(
+                "Logged in as: " + appContext.getAuthenticationService().getLoggedInManager().getUsername()
+        );
         userLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
-        userLabel.setForeground(UiTheme.PRIMARY_DARK);
+        userLabel.setForeground(UiTheme.MUTED);
 
         header.add(titles, BorderLayout.WEST);
         header.add(userLabel, BorderLayout.EAST);
 
         contentPanel.setBackground(UiTheme.BACKGROUND);
+        contentPanel.setOpaque(true);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 28, 28, 28));
+
         contentPanel.add(new DashboardPanel(appContext), DASHBOARD);
         contentPanel.add(new VehicleCatalogPanel(appContext), VEHICLES);
-        contentPanel.add(new PlaceholderPanel("Rental Operations", "Sprint 2 will be added here: rent vehicle, prevent double booking, and duration limits."), RENTALS);
-        contentPanel.add(new PlaceholderPanel("Returns Management", "Sprint 4 will be added here: return vehicle and close rental records."), RETURNS);
-        contentPanel.add(new PlaceholderPanel("Billing", "Sprint 4 and Sprint 5 billing, penalties, and type-specific pricing will be added here."), BILLING);
+        contentPanel.add(new RentalPanel(appContext), RENTALS);
+        contentPanel.add(
+                new PlaceholderPanel(
+                        "Returns Management",
+                        "Sprint 4 will be added here: return vehicle and close rental records."
+                ),
+                RETURNS
+        );
+        contentPanel.add(
+                new PlaceholderPanel(
+                        "Billing",
+                        "Sprint 4 and Sprint 5 billing, penalties, and type-specific pricing will be added here."
+                ),
+                BILLING
+        );
 
         mainArea.add(header, BorderLayout.NORTH);
         mainArea.add(contentPanel, BorderLayout.CENTER);
@@ -132,7 +186,9 @@ public class MainFrame extends JFrame {
     private void addMenuButton(JPanel menu, String pageKey, String label) {
         JButton button = new JButton(label);
         UiTheme.styleSidebarButton(button);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
         button.addActionListener(e -> showPage(pageKey));
+
         menuButtons.put(pageKey, button);
         menu.add(button);
     }
@@ -146,10 +202,10 @@ public class MainFrame extends JFrame {
     private void updateHeader(String pageKey) {
         if (DASHBOARD.equals(pageKey)) {
             pageTitle.setText("Dashboard");
-            pageSubtitle.setText("Sprint 1 overview and system status.");
+            pageSubtitle.setText("Sprint 2 GUI overview and system status.");
         } else if (VEHICLES.equals(pageKey)) {
             pageTitle.setText("Vehicle Catalog");
-            pageSubtitle.setText("Only available vehicles are displayed for Sprint 1.");
+            pageSubtitle.setText("Available vehicles are displayed with the updated blue and gold interface.");
         } else if (RENTALS.equals(pageKey)) {
             pageTitle.setText("Rent Vehicle");
             pageSubtitle.setText("Prepared for Sprint 2 rental operations.");
@@ -164,11 +220,15 @@ public class MainFrame extends JFrame {
 
     private void updateActiveMenu(String activePage) {
         for (Map.Entry<String, JButton> entry : menuButtons.entrySet()) {
+            JButton button = entry.getValue();
+
             if (entry.getKey().equals(activePage)) {
-                UiTheme.styleActiveSidebarButton(entry.getValue());
+                UiTheme.styleActiveSidebarButton(button);
             } else {
-                UiTheme.styleSidebarButton(entry.getValue());
+                UiTheme.styleSidebarButton(button);
             }
+
+            button.setHorizontalAlignment(SwingConstants.LEFT);
         }
     }
 }
