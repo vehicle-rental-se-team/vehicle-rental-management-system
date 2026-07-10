@@ -67,4 +67,11 @@ public class VehicleTableModel extends AbstractTableModel {
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false;
     }
+    public Vehicle getVehicleAt(int rowIndex) {
+        if (rowIndex < 0 || rowIndex >= vehicles.size()) {
+            return null;
+        }
+
+        return vehicles.get(rowIndex);
+    }
 }
