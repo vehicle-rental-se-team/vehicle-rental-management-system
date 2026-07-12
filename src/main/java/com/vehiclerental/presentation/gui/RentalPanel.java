@@ -1,10 +1,12 @@
 package com.vehiclerental.presentation.gui;
 
+import com.vehiclerental.domain.Rental;
 import com.vehiclerental.domain.Vehicle;
 import com.vehiclerental.exception.UnauthorizedAccessException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,6 +30,8 @@ public class RentalPanel extends JPanel {
     private final JTable vehicleTable;
     private final JTextField customerNameField;
     private final JTextField customerEmailField;
+    private final JTextField customerAgeField;
+    private final JCheckBox specialLicenseCheckBox;
     private final JTextField startDateField;
     private final JTextField endDateField;
     private final JLabel statusLabel;
@@ -36,10 +40,12 @@ public class RentalPanel extends JPanel {
         this.appContext = appContext;
         this.vehicleTableModel = new VehicleTableModel();
         this.vehicleTable = new JTable(vehicleTableModel);
-        this.customerNameField = new JTextField(18);
-        this.customerEmailField = new JTextField(18);
-        this.startDateField = new JTextField(12);
-        this.endDateField = new JTextField(12);
+        this.customerNameField = new JTextField(14);
+        this.customerEmailField = new JTextField(16);
+        this.customerAgeField = new JTextField(6);
+        this.specialLicenseCheckBox = new JCheckBox("Has special license");
+        this.startDateField = new JTextField(10);
+        this.endDateField = new JTextField(10);
         this.statusLabel = UiTheme.subtitleLabel("Select an available vehicle and enter rental details.");
 
         setLayout(new BorderLayout(0, 16));
@@ -48,9 +54,11 @@ public class RentalPanel extends JPanel {
         UiTheme.styleTable(vehicleTable);
         UiTheme.styleTextField(customerNameField);
         UiTheme.styleTextField(customerEmailField);
+        UiTheme.styleTextField(customerAgeField);
         UiTheme.styleTextField(startDateField);
         UiTheme.styleTextField(endDateField);
 
+        specialLicenseCheckBox.setBackground(UiTheme.SURFACE);
         startDateField.setText(LocalDate.now().toString());
         endDateField.setText(LocalDate.now().plusDays(1).toString());
 
@@ -64,17 +72,21 @@ public class RentalPanel extends JPanel {
         JPanel card = UiTheme.cardPanel();
         card.setLayout(new BorderLayout(12, 12));
 
-        JPanel fieldsPanel = new JPanel(new GridLayout(2, 5, 10, 10));
+        JPanel fieldsPanel = new JPanel(new GridLayout(2, 7, 8, 8));
         fieldsPanel.setBackground(UiTheme.SURFACE);
 
         fieldsPanel.add(new JLabel("Customer Name"));
         fieldsPanel.add(new JLabel("Customer Email"));
+        fieldsPanel.add(new JLabel("Customer Age"));
+        fieldsPanel.add(new JLabel("Special License"));
         fieldsPanel.add(new JLabel("Start Date"));
         fieldsPanel.add(new JLabel("End Date"));
         fieldsPanel.add(new JLabel(""));
 
         fieldsPanel.add(customerNameField);
         fieldsPanel.add(customerEmailField);
+        fieldsPanel.add(customerAgeField);
+        fieldsPanel.add(specialLicenseCheckBox);
         fieldsPanel.add(startDateField);
         fieldsPanel.add(endDateField);
 
@@ -89,7 +101,6 @@ public class RentalPanel extends JPanel {
 
         buttonPanel.add(refreshButton);
         buttonPanel.add(rentButton);
-
         fieldsPanel.add(buttonPanel);
 
         card.add(fieldsPanel, BorderLayout.CENTER);
@@ -97,7 +108,6 @@ public class RentalPanel extends JPanel {
 
         rentButton.addActionListener(e -> prepareRental());
         refreshButton.addActionListener(e -> loadAvailableVehicles());
-
         return card;
     }
 
@@ -108,7 +118,6 @@ public class RentalPanel extends JPanel {
                 BorderFactory.createLineBorder(UiTheme.BORDER),
                 BorderFactory.createEmptyBorder(0, 0, 0, 0)
         ));
-
         card.add(new JScrollPane(vehicleTable), BorderLayout.CENTER);
         return card;
     }
@@ -125,66 +134,71 @@ public class RentalPanel extends JPanel {
 
     private void prepareRental() {
         Vehicle selectedVehicle = getSelectedVehicle();
-
         if (selectedVehicle == null) {
-            JOptionPane.showMessageDialog(this, "Please select a vehicle first.", "Missing Vehicle", JOptionPane.WARNING_MESSAGE);
+            showWarning("Please select a vehicle first.", "Missing Vehicle");
             return;
         }
 
         String customerName = customerNameField.getText().trim();
+        String customerEmail = customerEmailField.getText().trim();
 
         if (customerName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter the customer name.", "Missing Customer", JOptionPane.WARNING_MESSAGE);
+            showWarning("Please enter the customer name.", "Missing Customer");
+            return;
+        }
+        if (customerEmail.isEmpty()) {
+            showWarning("Please enter the customer email.", "Missing Email");
             return;
         }
 
-        String customerEmail = customerEmailField.getText().trim();
-
-        if (customerEmail.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter the customer email.", "Missing Email", JOptionPane.WARNING_MESSAGE);
+        int customerAge;
+        try {
+            customerAge = Integer.parseInt(customerAgeField.getText().trim());
+        } catch (NumberFormatException exception) {
+            showWarning("Customer age must be a valid number.", "Invalid Age");
             return;
         }
 
         LocalDate startDate;
         LocalDate endDate;
-
         try {
             startDate = LocalDate.parse(startDateField.getText().trim());
             endDate = LocalDate.parse(endDateField.getText().trim());
         } catch (DateTimeParseException exception) {
-            JOptionPane.showMessageDialog(this, "Date format must be yyyy-MM-dd.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+            showWarning("Date format must be yyyy-MM-dd.", "Invalid Date");
             return;
         }
 
         if (!endDate.isAfter(startDate)) {
-            JOptionPane.showMessageDialog(this, "End date must be after start date.", "Invalid Rental Period", JOptionPane.WARNING_MESSAGE);
+            showWarning("End date must be after start date.", "Invalid Rental Period");
             return;
         }
 
         long rentalDays = ChronoUnit.DAYS.between(startDate, endDate);
-
         if (rentalDays > MAX_RENTAL_DAYS) {
-            JOptionPane.showMessageDialog(this, "Rental duration cannot exceed " + MAX_RENTAL_DAYS + " days.", "Invalid Rental Period", JOptionPane.WARNING_MESSAGE);
+            showWarning("Rental duration cannot exceed " + MAX_RENTAL_DAYS + " days.", "Invalid Rental Period");
             return;
         }
-        try {
-            com.vehiclerental.domain.Rental rental =
-                    appContext.getRentalService().rentVehicle(
-                            selectedVehicle.getId(),
-                            customerName,
-                            customerEmail,
-                            startDate,
-                            endDate
-                    );
 
-            double estimatedCost =
-                    appContext.getBillingService().calculateBaseCost(rental);
+        try {
+            Rental rental = appContext.getRentalService().rentVehicle(
+                    selectedVehicle.getId(),
+                    customerName,
+                    customerEmail,
+                    customerAge,
+                    specialLicenseCheckBox.isSelected(),
+                    startDate,
+                    endDate
+            );
+
+            double estimatedCost = appContext.getBillingService().calculateBaseCost(rental);
 
             JOptionPane.showMessageDialog(
                     this,
                     "Rental created successfully.\n\n"
                             + "Rental ID: " + rental.getId() + "\n"
                             + "Vehicle: " + rental.getVehicle().getId() + "\n"
+                            + "Type: " + rental.getVehicle().getType() + "\n"
                             + "Customer: " + rental.getCustomerName() + "\n"
                             + "Email: " + rental.getCustomerEmail() + "\n"
                             + "Start Date: " + rental.getStartDate() + "\n"
@@ -194,27 +208,29 @@ public class RentalPanel extends JPanel {
                     JOptionPane.INFORMATION_MESSAGE
             );
 
-            customerNameField.setText("");
-            customerEmailField.setText("");
+            clearForm();
             loadAvailableVehicles();
-
         } catch (RuntimeException exception) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    exception.getMessage(),
-                    "Rental Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, exception.getMessage(), "Rental Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void clearForm() {
+        customerNameField.setText("");
+        customerEmailField.setText("");
+        customerAgeField.setText("");
+        specialLicenseCheckBox.setSelected(false);
+    }
+
+    private void showWarning(String message, String title) {
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
     }
 
     private Vehicle getSelectedVehicle() {
         int selectedRow = vehicleTable.getSelectedRow();
-
         if (selectedRow < 0) {
             return null;
         }
-
         int modelRow = vehicleTable.convertRowIndexToModel(selectedRow);
         return vehicleTableModel.getVehicleAt(modelRow);
     }

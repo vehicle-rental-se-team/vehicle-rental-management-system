@@ -8,7 +8,13 @@ public class Vehicle {
     private final double dailyRate;
     private VehicleStatus status;
 
-    public Vehicle(String id, String brand, String model, double dailyRate, VehicleStatus status) {
+    public Vehicle(
+            String id,
+            String brand,
+            String model,
+            double dailyRate,
+            VehicleStatus status) {
+
         this.id = id;
         this.brand = brand;
         this.model = model;
@@ -44,10 +50,15 @@ public class Vehicle {
         return VehicleStatus.AVAILABLE.equals(status);
     }
 
+    public String getType() {
+        return "STANDARD";
+    }
+
     @Override
     public String toString() {
         return "Vehicle{" +
                 "id='" + id + '\'' +
+                ", type='" + getType() + '\'' +
                 ", brand='" + brand + '\'' +
                 ", model='" + model + '\'' +
                 ", dailyRate=" + dailyRate +
