@@ -13,6 +13,15 @@ public class Rental {
     private boolean active;
 
     public Rental(String id, Vehicle vehicle, Customer customer, LocalDate startDate, LocalDate endDate) {
+        this(id, vehicle, customer, startDate, endDate, true);
+    }
+
+    public Rental(String id,
+                  Vehicle vehicle,
+                  Customer customer,
+                  LocalDate startDate,
+                  LocalDate endDate,
+                  boolean active) {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("Rental id is required.");
         }
@@ -31,7 +40,7 @@ public class Rental {
         this.customer = customer;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.active = true;
+        this.active = active;
     }
 
     public String getId() {

@@ -9,7 +9,9 @@ import com.vehiclerental.domain.Vehicle;
 import com.vehiclerental.domain.VehicleStatus;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +91,50 @@ public class VehicleRepository {
     }
 
     public void addVehicle(Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Vehicle is required.");
+        }
+
         vehicles.add(vehicle);
+        saveVehiclesToFile();
+    }
+
+    public void updateVehicle(Vehicle vehicle) {
+        if (vehicle == null) {
+            throw new IllegalArgumentException("Vehicle is required.");
+        }
+
+        if (!findById(vehicle.getId()).isPresent()) {
+            throw new IllegalArgumentException("Vehicle does not exist: " + vehicle.getId());
+        }
+
+        saveVehiclesToFile();
+    }
+
+    private void saveVehiclesToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(VEHICLES_FILE_PATH))) {
+            for (Vehicle vehicle : vehicles) {
+                writer.write(convertVehicleToLine(vehicle));
+                writer.newLine();
+            }
+        } catch (IOException exception) {
+            throw new RuntimeException("Could not save vehicles to file: " + VEHICLES_FILE_PATH, exception);
+        }
+    }
+
+    private String convertVehicleToLine(Vehicle vehicle) {
+        String line = vehicle.getId()
+                + "," + vehicle.getType()
+                + "," + vehicle.getBrand()
+                + "," + vehicle.getModel()
+                + "," + vehicle.getDailyRate()
+                + "," + vehicle.getStatus();
+
+        if (vehicle instanceof ElectricVehicle) {
+            ElectricVehicle electricVehicle = (ElectricVehicle) vehicle;
+            line += "," + electricVehicle.getBatteryLevel();
+        }
+
+        return line;
     }
 }

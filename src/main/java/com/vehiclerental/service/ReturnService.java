@@ -41,6 +41,7 @@ public class ReturnService {
 
         rental.close();
         rental.getVehicle().setStatus(VehicleStatus.AVAILABLE);
+        rentalRepository.update(rental);
 
         return totalCost;
     }
