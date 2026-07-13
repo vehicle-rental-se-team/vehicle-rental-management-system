@@ -16,19 +16,19 @@ public class AuthenticationService {
     }
 
     public boolean login(String username, String password) {
-        Optional<Manager> managerOptional = managerRepository.findByUsername(username);
+        Optional<Manager> managerOptional =
+                managerRepository.findByUsername(username);
 
-        if (!managerOptional.isPresent()) {
-            return false;
+        if (managerOptional.isPresent()) {
+            Manager manager = managerOptional.get();
+
+            if (manager.getPassword().equals(password)) {
+                loggedInManager = manager;
+                return true;
+            }
         }
 
-        Manager manager = managerOptional.get();
-
-        if (manager.getPassword().equals(password)) {
-            loggedInManager = manager;
-            return true;
-        }
-
+        loggedInManager = null;
         return false;
     }
 
