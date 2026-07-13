@@ -1,5 +1,10 @@
 package com.vehiclerental.repository;
 
+import com.vehiclerental.domain.Car;
+import com.vehiclerental.domain.ElectricVehicle;
+import com.vehiclerental.domain.Motorcycle;
+import com.vehiclerental.domain.Truck;
+import com.vehiclerental.domain.Van;
 import com.vehiclerental.domain.Vehicle;
 import com.vehiclerental.domain.VehicleStatus;
 
@@ -27,8 +32,7 @@ public class VehicleRepository {
 
             while ((line = reader.readLine()) != null) {
                 if (!line.trim().isEmpty()) {
-                    Vehicle vehicle = convertLineToVehicle(line);
-                    vehicles.add(vehicle);
+                    vehicles.add(convertLineToVehicle(line));
                 }
             }
         } catch (IOException exception) {
@@ -39,17 +43,36 @@ public class VehicleRepository {
     private Vehicle convertLineToVehicle(String line) {
         String[] parts = line.split(",");
 
-        if (parts.length < 5) {
+        if (parts.length < 6) {
             throw new IllegalArgumentException("Invalid vehicle data: " + line);
         }
 
         String id = parts[0].trim();
-        String brand = parts[1].trim();
-        String model = parts[2].trim();
-        double dailyRate = Double.parseDouble(parts[3].trim());
-        VehicleStatus status = VehicleStatus.valueOf(parts[4].trim().toUpperCase());
+        String type = parts[1].trim().toUpperCase();
+        String brand = parts[2].trim();
+        String model = parts[3].trim();
+        double dailyRate = Double.parseDouble(parts[4].trim());
+        VehicleStatus status = VehicleStatus.valueOf(parts[5].trim().toUpperCase());
 
-        return new Vehicle(id, brand, model, dailyRate, status);
+        switch (type) {
+            case "CAR":
+                return new Car(id, brand, model, dailyRate, status);
+            case "MOTORCYCLE":
+                return new Motorcycle(id, brand, model, dailyRate, status);
+            case "VAN":
+                return new Van(id, brand, model, dailyRate, status);
+            case "TRUCK":
+                return new Truck(id, brand, model, dailyRate, status);
+            case "ELECTRIC":
+            case "ELECTRIC_VEHICLE":
+                if (parts.length < 7) {
+                    throw new IllegalArgumentException("Battery level is required for electric vehicle: " + line);
+                }
+                int batteryLevel = Integer.parseInt(parts[6].trim());
+                return new ElectricVehicle(id, brand, model, dailyRate, status, batteryLevel);
+            default:
+                throw new IllegalArgumentException("Unknown vehicle type: " + type);
+        }
     }
 
     public List<Vehicle> findAll() {
@@ -62,7 +85,6 @@ public class VehicleRepository {
                 return Optional.of(vehicle);
             }
         }
-
         return Optional.empty();
     }
 
