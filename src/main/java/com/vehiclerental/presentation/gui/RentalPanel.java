@@ -21,7 +21,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-public class RentalPanel extends JPanel {
+public class RentalPanel extends JPanel implements RefreshablePanel {
 
     private static final int MAX_RENTAL_DAYS = 30;
 
@@ -233,5 +233,10 @@ public class RentalPanel extends JPanel {
         }
         int modelRow = vehicleTable.convertRowIndexToModel(selectedRow);
         return vehicleTableModel.getVehicleAt(modelRow);
+    }
+
+    @Override
+    public void refreshData() {
+        loadAvailableVehicles();
     }
 }

@@ -17,7 +17,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.List;
 
-public class VehicleCatalogPanel extends JPanel {
+public class VehicleCatalogPanel extends JPanel implements RefreshablePanel {
 
     private final AppContext appContext;
     private final VehicleTableModel tableModel;
@@ -117,5 +117,10 @@ public class VehicleCatalogPanel extends JPanel {
     private void clearSearch() {
         searchField.setText("");
         sorter.setRowFilter(null);
+    }
+
+    @Override
+    public void refreshData() {
+        loadAvailableVehicles();
     }
 }

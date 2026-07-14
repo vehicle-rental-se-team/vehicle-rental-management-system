@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-public class BillingPanel extends JPanel {
+public class BillingPanel extends JPanel implements RefreshablePanel {
 
     private final AppContext appContext;
     private final DefaultTableModel tableModel;
@@ -154,5 +154,10 @@ public class BillingPanel extends JPanel {
                 "Rental Bill",
                 JOptionPane.INFORMATION_MESSAGE
         );
+    }
+
+    @Override
+    public void refreshData() {
+        loadRentals();
     }
 }

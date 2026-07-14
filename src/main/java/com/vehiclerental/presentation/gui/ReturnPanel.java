@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-public class ReturnPanel extends JPanel {
+public class ReturnPanel extends JPanel implements RefreshablePanel {
 
     private final AppContext appContext;
     private final DefaultTableModel tableModel;
@@ -149,5 +149,10 @@ public class ReturnPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE
             );
         }
+    }
+
+    @Override
+    public void refreshData() {
+        loadActiveRentals();
     }
 }

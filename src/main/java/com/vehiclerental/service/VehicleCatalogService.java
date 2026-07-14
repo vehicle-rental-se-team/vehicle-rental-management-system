@@ -29,4 +29,9 @@ public class VehicleCatalogService {
 
         return availableVehicles;
     }
+
+    public List<Vehicle> getAllVehicles() {
+        authenticationService.requireLogin();
+        return vehicleRepository.findAll();
+    }
 }

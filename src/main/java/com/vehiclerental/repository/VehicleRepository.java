@@ -95,6 +95,12 @@ public class VehicleRepository {
             throw new IllegalArgumentException("Vehicle is required.");
         }
 
+        if (findById(vehicle.getId()).isPresent()) {
+            throw new IllegalArgumentException(
+                    "Vehicle id already exists: " + vehicle.getId()
+            );
+        }
+
         vehicles.add(vehicle);
         saveVehiclesToFile();
     }
