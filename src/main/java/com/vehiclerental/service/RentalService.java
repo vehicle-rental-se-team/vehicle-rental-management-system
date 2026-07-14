@@ -11,6 +11,9 @@ import com.vehiclerental.exception.InvalidRentalPeriodException;
 import com.vehiclerental.exception.RentalAlreadyExistsException;
 import com.vehiclerental.exception.VehicleNotAvailableException;
 import com.vehiclerental.exception.VehicleNotFoundException;
+import com.vehiclerental.repository.MaintenanceRepository;
+import com.vehiclerental.repository.VehicleDocumentsRepository;
+import com.vehiclerental.repository.VehicleFuelRepository;
 import com.vehiclerental.repository.RentalRepository;
 import com.vehiclerental.repository.VehicleRepository;
 import com.vehiclerental.strategy.ElectricVehicleValidationStrategy;
@@ -31,13 +34,35 @@ public class RentalService {
     private final VehicleRepository vehicleRepository;
     private final RentalRepository rentalRepository;
     private final AuthenticationService authenticationService;
+    private final MaintenanceRepository maintenanceRepository;
+    private final VehicleFuelRepository fuelRepository;
+    private final VehicleDocumentsRepository documentsRepository;
 
     public RentalService(VehicleRepository vehicleRepository,
                          RentalRepository rentalRepository,
                          AuthenticationService authenticationService) {
+        this(vehicleRepository, rentalRepository, authenticationService, null, null, null);
+    }
+
+    public RentalService(VehicleRepository vehicleRepository,
+                         RentalRepository rentalRepository,
+                         AuthenticationService authenticationService,
+                         MaintenanceRepository maintenanceRepository) {
+        this(vehicleRepository, rentalRepository, authenticationService, maintenanceRepository, null, null);
+    }
+
+    public RentalService(VehicleRepository vehicleRepository,
+                         RentalRepository rentalRepository,
+                         AuthenticationService authenticationService,
+                         MaintenanceRepository maintenanceRepository,
+                         VehicleFuelRepository fuelRepository,
+                         VehicleDocumentsRepository documentsRepository) {
         this.vehicleRepository = vehicleRepository;
         this.rentalRepository = rentalRepository;
         this.authenticationService = authenticationService;
+        this.maintenanceRepository = maintenanceRepository;
+        this.fuelRepository = fuelRepository;
+        this.documentsRepository = documentsRepository;
     }
 
     public Rental rentVehicle(String vehicleId,
@@ -72,6 +97,10 @@ public class RentalService {
             throw new RentalAlreadyExistsException("Vehicle already has an active rental.");
         }
 
+        validateMaintenanceSchedule(vehicle.getId(), endDate);
+        validateFuelLevel(vehicle);
+        validateVehicleDocuments(vehicle.getId(), endDate);
+
         RentalValidationStrategy strategy = selectValidationStrategy(vehicle);
         strategy.validate(vehicle, new RentalRequest(customerAge, hasSpecialLicense));
 
@@ -91,7 +120,58 @@ public class RentalService {
 
         rentalRepository.save(rental);
         vehicle.setStatus(VehicleStatus.RENTED);
+        vehicleRepository.updateVehicle(vehicle);
         return rental;
+    }
+
+    private void validateMaintenanceSchedule(String vehicleId, LocalDate endDate) {
+        if (maintenanceRepository == null) {
+            return;
+        }
+
+        maintenanceRepository.findPendingByVehicleId(vehicleId)
+                .ifPresent(record -> {
+                    if (!record.getNextMaintenanceDate().isAfter(endDate)) {
+                        throw new InvalidRentalPeriodException(
+                                "Rental period conflicts with maintenance date: "
+                                        + record.getNextMaintenanceDate()
+                        );
+                    }
+                });
+    }
+
+    private void validateFuelLevel(Vehicle vehicle) {
+        if (fuelRepository == null || vehicle instanceof ElectricVehicle) {
+            return;
+        }
+
+        fuelRepository.findByVehicleId(vehicle.getId())
+                .filter(record -> record.getFuelLevel() < 20)
+                .ifPresent(record -> {
+                    throw new VehicleNotAvailableException(
+                            "Vehicle fuel level must be at least 20%."
+                    );
+                });
+    }
+
+    private void validateVehicleDocuments(String vehicleId, LocalDate endDate) {
+        if (documentsRepository == null) {
+            return;
+        }
+
+        documentsRepository.findByVehicleId(vehicleId)
+                .ifPresent(documents -> {
+                    if (!documents.getRegistrationExpiryDate().isAfter(endDate)) {
+                        throw new VehicleNotAvailableException(
+                                "Vehicle registration expires during the rental period."
+                        );
+                    }
+                    if (!documents.getInsuranceExpiryDate().isAfter(endDate)) {
+                        throw new VehicleNotAvailableException(
+                                "Vehicle insurance expires during the rental period."
+                        );
+                    }
+                });
     }
 
     private RentalValidationStrategy selectValidationStrategy(Vehicle vehicle) {

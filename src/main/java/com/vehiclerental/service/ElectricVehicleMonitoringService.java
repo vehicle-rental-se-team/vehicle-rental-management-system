@@ -15,12 +15,23 @@ public class ElectricVehicleMonitoringService {
     private final RentalRepository rentalRepository;
     private final NotificationPublisher notificationPublisher;
     private final String notificationRecipient;
+    private final VehicleAvailabilityService availabilityService;
 
     public ElectricVehicleMonitoringService(
             VehicleRepository vehicleRepository,
             RentalRepository rentalRepository,
             NotificationPublisher notificationPublisher,
             String notificationRecipient) {
+        this(vehicleRepository, rentalRepository, notificationPublisher,
+                notificationRecipient, null);
+    }
+
+    public ElectricVehicleMonitoringService(
+            VehicleRepository vehicleRepository,
+            RentalRepository rentalRepository,
+            NotificationPublisher notificationPublisher,
+            String notificationRecipient,
+            VehicleAvailabilityService availabilityService) {
 
         if (vehicleRepository == null) {
             throw new IllegalArgumentException("Vehicle repository is required.");
@@ -39,6 +50,7 @@ public class ElectricVehicleMonitoringService {
         this.rentalRepository = rentalRepository;
         this.notificationPublisher = notificationPublisher;
         this.notificationRecipient = notificationRecipient;
+        this.availabilityService = availabilityService;
     }
 
     public void updateBatteryLevel(String vehicleId, int batteryLevel) {
@@ -55,7 +67,12 @@ public class ElectricVehicleMonitoringService {
                 .isPresent();
 
         electricVehicle.setBatteryLevel(batteryLevel);
-        updateVehicleStatus(electricVehicle, hasActiveRental);
+
+        if (availabilityService != null) {
+            availabilityService.applyStatus(electricVehicle, java.time.LocalDate.now());
+        } else {
+            updateVehicleStatus(electricVehicle, hasActiveRental);
+        }
         sendBatteryNotification(electricVehicle, hasActiveRental);
         vehicleRepository.updateVehicle(electricVehicle);
     }
