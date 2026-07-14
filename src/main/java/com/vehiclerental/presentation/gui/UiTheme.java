@@ -1,9 +1,12 @@
 package com.vehiclerental.presentation.gui;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTable;
@@ -13,11 +16,15 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicButtonUI;
+import javax.swing.plaf.basic.BasicComboBoxUI;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
@@ -40,6 +47,7 @@ public final class UiTheme {
     public static final Color BORDER = new Color(55, 85, 130);
     public static final Color SUCCESS = new Color(75, 180, 110);
     public static final Color ERROR = new Color(210, 85, 85);
+    public static final Color INPUT_BACKGROUND = new Color(10, 24, 46);
 
     private UiTheme() {
     }
@@ -51,6 +59,16 @@ public final class UiTheme {
         UIManager.put("OptionPane.messageForeground", TEXT);
         UIManager.put("OptionPane.border", BorderFactory.createLineBorder(BORDER));
         UIManager.put("Label.foreground", TEXT);
+
+        UIManager.put("ComboBox.background", INPUT_BACKGROUND);
+        UIManager.put("ComboBox.foreground", TEXT);
+        UIManager.put("ComboBox.selectionBackground", SIDEBAR_ACTIVE);
+        UIManager.put("ComboBox.selectionForeground", PRIMARY_LIGHT);
+        UIManager.put("ComboBox.buttonBackground", SURFACE_ALT);
+        UIManager.put("List.background", INPUT_BACKGROUND);
+        UIManager.put("List.foreground", TEXT);
+        UIManager.put("List.selectionBackground", SIDEBAR_ACTIVE);
+        UIManager.put("List.selectionForeground", PRIMARY_LIGHT);
     }
 
     public static void stylePrimaryButton(JButton button) {
@@ -111,7 +129,7 @@ public final class UiTheme {
 
     public static void styleTextField(JTextField field) {
         field.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        field.setBackground(new Color(10, 24, 46));
+        field.setBackground(INPUT_BACKGROUND);
         field.setForeground(TEXT);
         field.setCaretColor(PRIMARY_LIGHT);
         field.setOpaque(true);
@@ -120,11 +138,75 @@ public final class UiTheme {
 
     public static void stylePasswordField(JPasswordField field) {
         field.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        field.setBackground(new Color(10, 24, 46));
+        field.setBackground(INPUT_BACKGROUND);
         field.setForeground(TEXT);
         field.setCaretColor(PRIMARY_LIGHT);
         field.setOpaque(true);
         field.setBorder(compoundInputBorder());
+    }
+
+    public static <T> void styleComboBox(JComboBox<T> comboBox) {
+        comboBox.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        comboBox.setBackground(INPUT_BACKGROUND);
+        comboBox.setForeground(TEXT);
+        comboBox.setOpaque(true);
+        comboBox.setFocusable(false);
+        comboBox.setBorder(compoundInputBorder());
+
+        // Force a Swing Basic UI so Windows does not repaint the combo box in white.
+        comboBox.setUI(new BasicComboBoxUI() {
+            @Override
+            protected JButton createArrowButton() {
+                JButton arrowButton = new JButton("▼");
+                arrowButton.setFont(new Font("SansSerif", Font.BOLD, 11));
+                arrowButton.setBackground(SURFACE_ALT);
+                arrowButton.setForeground(TEXT);
+                arrowButton.setOpaque(true);
+                arrowButton.setContentAreaFilled(true);
+                arrowButton.setBorderPainted(false);
+                arrowButton.setFocusPainted(false);
+                arrowButton.setFocusable(false);
+                return arrowButton;
+            }
+
+            @Override
+            public void paintCurrentValueBackground(
+                    Graphics graphics,
+                    Rectangle bounds,
+                    boolean hasFocus) {
+                graphics.setColor(INPUT_BACKGROUND);
+                graphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            }
+        });
+
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list,
+                    Object value,
+                    int index,
+                    boolean isSelected,
+                    boolean cellHasFocus) {
+
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, value, index, isSelected, cellHasFocus
+                );
+
+                label.setOpaque(true);
+                label.setFont(new Font("SansSerif", Font.PLAIN, 14));
+                label.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+
+                if (isSelected && index >= 0) {
+                    label.setBackground(SIDEBAR_ACTIVE);
+                    label.setForeground(PRIMARY_LIGHT);
+                } else {
+                    label.setBackground(INPUT_BACKGROUND);
+                    label.setForeground(TEXT);
+                }
+
+                return label;
+            }
+        });
     }
 
     public static void styleTable(JTable table) {

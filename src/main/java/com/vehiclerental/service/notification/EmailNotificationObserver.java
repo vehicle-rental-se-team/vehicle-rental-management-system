@@ -13,6 +13,6 @@ public class EmailNotificationObserver implements NotificationObserver {
 
     @Override
     public void update(String recipient, String message) {
-        notificationService.sendReminder(recipient, message);
+        notificationService.sendNotification(recipient, message);
     }
 }

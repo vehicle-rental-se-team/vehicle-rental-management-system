@@ -3,24 +3,26 @@ package com.vehiclerental.presentation.gui;
 import com.vehiclerental.repository.MaintenanceRepository;
 import com.vehiclerental.repository.ManagerRepository;
 import com.vehiclerental.repository.RentalRepository;
-import com.vehiclerental.repository.VehicleIncidentRepository;
-import com.vehiclerental.repository.VehicleFuelRepository;
 import com.vehiclerental.repository.VehicleDocumentsRepository;
+import com.vehiclerental.repository.VehicleFuelRepository;
+import com.vehiclerental.repository.VehicleIncidentRepository;
 import com.vehiclerental.repository.VehicleRepository;
 import com.vehiclerental.service.AuthenticationService;
 import com.vehiclerental.service.BillingService;
 import com.vehiclerental.service.ElectricVehicleMonitoringService;
+import com.vehiclerental.service.FuelMonitoringService;
 import com.vehiclerental.service.MaintenanceService;
 import com.vehiclerental.service.RentalService;
 import com.vehiclerental.service.ReturnService;
-import com.vehiclerental.service.VehicleCatalogService;
-import com.vehiclerental.service.VehicleIncidentService;
 import com.vehiclerental.service.VehicleAvailabilityService;
-import com.vehiclerental.service.FuelMonitoringService;
+import com.vehiclerental.service.VehicleCatalogService;
 import com.vehiclerental.service.VehicleDocumentsService;
 import com.vehiclerental.service.VehicleHistoryService;
+import com.vehiclerental.service.VehicleManagementService;
+import com.vehiclerental.service.VehicleIncidentService;
 import com.vehiclerental.service.notification.EmailNotificationObserver;
 import com.vehiclerental.service.notification.EmailNotificationService;
+import com.vehiclerental.service.notification.NotificationLogObserver;
 import com.vehiclerental.service.notification.NotificationPublisher;
 import com.vehiclerental.service.notification.NotificationService;
 import com.vehiclerental.service.reminder.RentalReminderService;
@@ -46,6 +48,7 @@ public class AppContext {
     private final ReturnService returnService;
     private final NotificationService notificationService;
     private final NotificationPublisher notificationPublisher;
+    private final NotificationLogObserver notificationLogObserver;
     private final RentalReminderService rentalReminderService;
     private final ElectricVehicleMonitoringService electricVehicleMonitoringService;
     private final VehicleIncidentService vehicleIncidentService;
@@ -54,6 +57,7 @@ public class AppContext {
     private final FuelMonitoringService fuelMonitoringService;
     private final VehicleDocumentsService vehicleDocumentsService;
     private final VehicleHistoryService vehicleHistoryService;
+    private final VehicleManagementService vehicleManagementService;
 
     public AppContext() {
         this.managerRepository = new ManagerRepository();
@@ -66,8 +70,7 @@ public class AppContext {
 
         this.authenticationService = new AuthenticationService(managerRepository);
         this.vehicleCatalogService = new VehicleCatalogService(
-                vehicleRepository,
-                authenticationService
+                vehicleRepository, authenticationService
         );
         this.vehicleAvailabilityService = new VehicleAvailabilityService(
                 rentalRepository,
@@ -96,13 +99,13 @@ public class AppContext {
 
         this.notificationService = new EmailNotificationService();
         this.notificationPublisher = new NotificationPublisher();
+        this.notificationLogObserver = new NotificationLogObserver();
         this.notificationPublisher.addObserver(
                 new EmailNotificationObserver(notificationService)
         );
+        this.notificationPublisher.addObserver(notificationLogObserver);
 
-        this.rentalReminderService = new RentalReminderService(
-                notificationPublisher
-        );
+        this.rentalReminderService = new RentalReminderService(notificationPublisher);
         this.electricVehicleMonitoringService =
                 new ElectricVehicleMonitoringService(
                         vehicleRepository,
@@ -156,83 +159,35 @@ public class AppContext {
                 vehicleDocumentsRepository,
                 authenticationService
         );
+        this.vehicleManagementService = new VehicleManagementService(
+                vehicleRepository,
+                vehicleFuelRepository,
+                authenticationService
+        );
+
         this.maintenanceService.checkMaintenance(LocalDate.now());
         this.vehicleDocumentsService.checkDocuments(LocalDate.now());
     }
 
-    public AuthenticationService getAuthenticationService() {
-        return authenticationService;
-    }
-
-    public VehicleCatalogService getVehicleCatalogService() {
-        return vehicleCatalogService;
-    }
-
-    public RentalService getRentalService() {
-        return rentalService;
-    }
-
-    public RentalRepository getRentalRepository() {
-        return rentalRepository;
-    }
-
-    public BillingService getBillingService() {
-        return billingService;
-    }
-
-    public ReturnService getReturnService() {
-        return returnService;
-    }
-
-    public NotificationPublisher getNotificationPublisher() {
-        return notificationPublisher;
-    }
-
-    public RentalReminderService getRentalReminderService() {
-        return rentalReminderService;
-    }
-
-    public ElectricVehicleMonitoringService getElectricVehicleMonitoringService() {
-        return electricVehicleMonitoringService;
-    }
-
-    public VehicleIncidentRepository getVehicleIncidentRepository() {
-        return vehicleIncidentRepository;
-    }
-
-    public VehicleIncidentService getVehicleIncidentService() {
-        return vehicleIncidentService;
-    }
-
-    public MaintenanceRepository getMaintenanceRepository() {
-        return maintenanceRepository;
-    }
-
-    public MaintenanceService getMaintenanceService() {
-        return maintenanceService;
-    }
-    public VehicleFuelRepository getVehicleFuelRepository() {
-        return vehicleFuelRepository;
-    }
-
-    public VehicleDocumentsRepository getVehicleDocumentsRepository() {
-        return vehicleDocumentsRepository;
-    }
-
-    public FuelMonitoringService getFuelMonitoringService() {
-        return fuelMonitoringService;
-    }
-
-    public VehicleDocumentsService getVehicleDocumentsService() {
-        return vehicleDocumentsService;
-    }
-
-    public VehicleHistoryService getVehicleHistoryService() {
-        return vehicleHistoryService;
-    }
-
-    public VehicleAvailabilityService getVehicleAvailabilityService() {
-        return vehicleAvailabilityService;
-    }
-
+    public AuthenticationService getAuthenticationService() { return authenticationService; }
+    public VehicleCatalogService getVehicleCatalogService() { return vehicleCatalogService; }
+    public RentalService getRentalService() { return rentalService; }
+    public RentalRepository getRentalRepository() { return rentalRepository; }
+    public BillingService getBillingService() { return billingService; }
+    public ReturnService getReturnService() { return returnService; }
+    public NotificationPublisher getNotificationPublisher() { return notificationPublisher; }
+    public NotificationLogObserver getNotificationLogObserver() { return notificationLogObserver; }
+    public RentalReminderService getRentalReminderService() { return rentalReminderService; }
+    public ElectricVehicleMonitoringService getElectricVehicleMonitoringService() { return electricVehicleMonitoringService; }
+    public VehicleIncidentRepository getVehicleIncidentRepository() { return vehicleIncidentRepository; }
+    public VehicleIncidentService getVehicleIncidentService() { return vehicleIncidentService; }
+    public MaintenanceRepository getMaintenanceRepository() { return maintenanceRepository; }
+    public MaintenanceService getMaintenanceService() { return maintenanceService; }
+    public VehicleFuelRepository getVehicleFuelRepository() { return vehicleFuelRepository; }
+    public VehicleDocumentsRepository getVehicleDocumentsRepository() { return vehicleDocumentsRepository; }
+    public FuelMonitoringService getFuelMonitoringService() { return fuelMonitoringService; }
+    public VehicleDocumentsService getVehicleDocumentsService() { return vehicleDocumentsService; }
+    public VehicleHistoryService getVehicleHistoryService() { return vehicleHistoryService; }
+    public VehicleManagementService getVehicleManagementService() { return vehicleManagementService; }
+    public VehicleAvailabilityService getVehicleAvailabilityService() { return vehicleAvailabilityService; }
 }
