@@ -77,4 +77,79 @@ class RentalServiceTest {
                         LocalDate.of(2026, 7, 1),
                         LocalDate.of(2026, 8, 2)));
     }
+
+    @Test
+    void shouldRejectUnavailableVehicle() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        Car car = new Car(
+                "V1", "Toyota", "Corolla", 50,
+                VehicleStatus.UNAVAILABLE
+        );
+        when(vehicleRepository.findById("V1")).thenReturn(Optional.of(car));
+
+        RentalService service = new RentalService(
+                vehicleRepository,
+                mock(RentalRepository.class),
+                mock(AuthenticationService.class)
+        );
+
+        assertThrows(RuntimeException.class, () ->
+                service.rentVehicle(
+                        "V1", "Ahmad", "ahmad@test.com", 25, false,
+                        LocalDate.of(2026, 7, 1),
+                        LocalDate.of(2026, 7, 5)
+                ));
+    }
+
+    @Test
+    void shouldRejectUnknownVehicle() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        when(vehicleRepository.findById("V9")).thenReturn(Optional.empty());
+
+        RentalService service = new RentalService(
+                vehicleRepository,
+                mock(RentalRepository.class),
+                mock(AuthenticationService.class)
+        );
+
+        assertThrows(RuntimeException.class, () ->
+                service.rentVehicle(
+                        "V9", "Ahmad", "ahmad@test.com", 25, false,
+                        LocalDate.of(2026, 7, 1),
+                        LocalDate.of(2026, 7, 5)
+                ));
+    }
+
+    @Test
+    void shouldRejectInvalidCustomerEmail() {
+        RentalService service = new RentalService(
+                mock(VehicleRepository.class),
+                mock(RentalRepository.class),
+                mock(AuthenticationService.class)
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+                service.rentVehicle(
+                        "V1", "Ahmad", "invalid-email", 25, false,
+                        LocalDate.of(2026, 7, 1),
+                        LocalDate.of(2026, 7, 5)
+                ));
+    }
+
+    @Test
+    void shouldRejectEndDateEqualToStartDate() {
+        RentalService service = new RentalService(
+                mock(VehicleRepository.class),
+                mock(RentalRepository.class),
+                mock(AuthenticationService.class)
+        );
+
+        assertThrows(InvalidRentalPeriodException.class, () ->
+                service.rentVehicle(
+                        "V1", "Ahmad", "ahmad@test.com", 25, false,
+                        LocalDate.of(2026, 7, 1),
+                        LocalDate.of(2026, 7, 1)
+                ));
+    }
+
 }

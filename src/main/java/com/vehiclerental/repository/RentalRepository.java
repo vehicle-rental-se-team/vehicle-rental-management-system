@@ -20,14 +20,23 @@ public class RentalRepository {
 
     private static final String RENTALS_FILE_PATH = "data/rentals.txt";
 
+    private final String filePath;
     private final List<Rental> rentals;
     private final VehicleRepository vehicleRepository;
 
     public RentalRepository(VehicleRepository vehicleRepository) {
+        this(RENTALS_FILE_PATH, vehicleRepository);
+    }
+
+    public RentalRepository(
+            String filePath,
+            VehicleRepository vehicleRepository) {
+
         if (vehicleRepository == null) {
             throw new IllegalArgumentException("Vehicle repository is required.");
         }
 
+        this.filePath = filePath;
         this.vehicleRepository = vehicleRepository;
         this.rentals = new ArrayList<>();
         createRentalsFileIfMissing();
@@ -63,7 +72,8 @@ public class RentalRepository {
 
     public Optional<Rental> findActiveRentalByVehicleId(String vehicleId) {
         for (Rental rental : rentals) {
-            if (rental.isActive() && rental.getVehicle().getId().equals(vehicleId)) {
+            if (rental.isActive()
+                    && rental.getVehicle().getId().equals(vehicleId)) {
                 return Optional.of(rental);
             }
         }
@@ -76,7 +86,7 @@ public class RentalRepository {
     }
 
     private void createRentalsFileIfMissing() {
-        File rentalsFile = new File(RENTALS_FILE_PATH);
+        File rentalsFile = new File(filePath);
         File parentDirectory = rentalsFile.getParentFile();
 
         try {
@@ -89,14 +99,14 @@ public class RentalRepository {
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not create rentals file: " + RENTALS_FILE_PATH,
+                    "Could not create rentals file: " + filePath,
                     exception
             );
         }
     }
 
     private void loadRentalsFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(RENTALS_FILE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -111,7 +121,7 @@ public class RentalRepository {
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not load rentals from file: " + RENTALS_FILE_PATH,
+                    "Could not load rentals from file: " + filePath,
                     exception
             );
         }
@@ -138,7 +148,11 @@ public class RentalRepository {
                         "Vehicle not found for rental: " + vehicleId
                 ));
 
-        Customer customer = new Customer(customerId, customerName, customerEmail);
+        Customer customer = new Customer(
+                customerId,
+                customerName,
+                customerEmail
+        );
 
         return new Rental(
                 rentalId,
@@ -151,28 +165,28 @@ public class RentalRepository {
     }
 
     private void saveAllRentalsToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(RENTALS_FILE_PATH))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Rental rental : rentals) {
                 writer.write(convertRentalToLine(rental));
                 writer.newLine();
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not save rentals to file: " + RENTALS_FILE_PATH,
+                    "Could not save rentals to file: " + filePath,
                     exception
             );
         }
     }
 
     private String convertRentalToLine(Rental rental) {
-        return rental.getId() + "," +
-                rental.getVehicle().getId() + "," +
-                rental.getCustomer().getId() + "," +
-                cleanText(rental.getCustomerName()) + "," +
-                cleanText(rental.getCustomerEmail()) + "," +
-                rental.getStartDate() + "," +
-                rental.getEndDate() + "," +
-                rental.isActive();
+        return rental.getId() + ","
+                + rental.getVehicle().getId() + ","
+                + rental.getCustomer().getId() + ","
+                + cleanText(rental.getCustomerName()) + ","
+                + cleanText(rental.getCustomerEmail()) + ","
+                + rental.getStartDate() + ","
+                + rental.getEndDate() + ","
+                + rental.isActive();
     }
 
     private String cleanText(String value) {

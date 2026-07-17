@@ -66,4 +66,76 @@ class VehicleDocumentsServiceTest {
         verify(publisher).notifyObservers(
                 eq("manager@test.com"), contains("Registration"));
     }
+
+    @Test
+    void shouldSendExpiredDocumentNotifications() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        VehicleDocumentsRepository documentsRepository = mock(VehicleDocumentsRepository.class);
+        VehicleAvailabilityService availabilityService = mock(VehicleAvailabilityService.class);
+        NotificationPublisher publisher = mock(NotificationPublisher.class);
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+        VehicleDocuments documents = new VehicleDocuments(
+                "V1",
+                LocalDate.of(2026, 7, 1),
+                LocalDate.of(2026, 7, 1)
+        );
+        when(documentsRepository.findAll())
+                .thenReturn(Collections.singletonList(documents));
+        when(vehicleRepository.findById("V1")).thenReturn(Optional.of(car));
+
+        VehicleDocumentsService service = new VehicleDocumentsService(
+                vehicleRepository,
+                documentsRepository,
+                availabilityService,
+                publisher,
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        int count = service.checkDocuments(LocalDate.of(2026, 7, 1));
+
+        assertEquals(2, count);
+        verify(publisher, times(2)).notifyObservers(
+                eq("manager@test.com"), contains("expired")
+        );
+        verify(vehicleRepository).updateVehicle(car);
+    }
+
+    @Test
+    void shouldRejectNullDateWhenCheckingDocuments() {
+        VehicleDocumentsService service = new VehicleDocumentsService(
+                mock(VehicleRepository.class),
+                mock(VehicleDocumentsRepository.class),
+                mock(VehicleAvailabilityService.class),
+                mock(NotificationPublisher.class),
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.checkDocuments(null));
+    }
+
+    @Test
+    void shouldRejectMissingVehicleDocuments() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        VehicleDocumentsRepository documentsRepository = mock(VehicleDocumentsRepository.class);
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+        when(vehicleRepository.findById("V1")).thenReturn(Optional.of(car));
+        when(documentsRepository.findByVehicleId("V1"))
+                .thenReturn(Optional.empty());
+
+        VehicleDocumentsService service = new VehicleDocumentsService(
+                vehicleRepository,
+                documentsRepository,
+                mock(VehicleAvailabilityService.class),
+                mock(NotificationPublisher.class),
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.getDocuments("V1"));
+    }
+
 }

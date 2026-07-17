@@ -16,10 +16,16 @@ public class VehicleFuelRepository {
 
     private static final String FUEL_FILE_PATH = "data/fuel.txt";
 
+    private final String filePath;
     private final List<FuelRecord> records;
 
     public VehicleFuelRepository() {
-        records = new ArrayList<>();
+        this(FUEL_FILE_PATH);
+    }
+
+    public VehicleFuelRepository(String filePath) {
+        this.filePath = filePath;
+        this.records = new ArrayList<>();
         createFileIfMissing();
         loadFromFile();
     }
@@ -55,7 +61,7 @@ public class VehicleFuelRepository {
 
     private void createFileIfMissing() {
         try {
-            File file = new File(FUEL_FILE_PATH);
+            File file = new File(filePath);
             File parent = file.getParentFile();
 
             if (parent != null && !parent.exists()) {
@@ -70,7 +76,7 @@ public class VehicleFuelRepository {
     }
 
     private void loadFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(FUEL_FILE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -93,7 +99,7 @@ public class VehicleFuelRepository {
     }
 
     private void saveToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FUEL_FILE_PATH))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (FuelRecord record : records) {
                 writer.write(record.getVehicleId() + "," + record.getFuelLevel());
                 writer.newLine();

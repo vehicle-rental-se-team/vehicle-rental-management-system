@@ -45,4 +45,29 @@ class NotificationPublisherTest {
         verify(observer, never()).update(anyString(), anyString());
         assertEquals(0, publisher.getObserverCount());
     }
+
+    @Test
+    void shouldRejectNullObserver() {
+        NotificationPublisher publisher = new NotificationPublisher();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> publisher.addObserver(null));
+    }
+
+    @Test
+    void shouldRejectBlankRecipient() {
+        NotificationPublisher publisher = new NotificationPublisher();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> publisher.notifyObservers(" ", "Message"));
+    }
+
+    @Test
+    void shouldRejectBlankMessage() {
+        NotificationPublisher publisher = new NotificationPublisher();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> publisher.notifyObservers("manager@test.com", " "));
+    }
+
 }

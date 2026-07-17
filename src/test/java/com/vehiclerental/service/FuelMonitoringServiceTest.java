@@ -60,4 +60,91 @@ class FuelMonitoringServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 service.updateFuelLevel("E1", 50, LocalDate.of(2026, 7, 1)));
     }
+
+    @Test
+    void shouldSendEmptyFuelNotification() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        VehicleFuelRepository fuelRepository = mock(VehicleFuelRepository.class);
+        VehicleAvailabilityService availabilityService = mock(VehicleAvailabilityService.class);
+        NotificationPublisher publisher = mock(NotificationPublisher.class);
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+        when(vehicleRepository.findById("V1")).thenReturn(Optional.of(car));
+        when(fuelRepository.findByVehicleId("V1")).thenReturn(Optional.empty());
+
+        FuelMonitoringService service = new FuelMonitoringService(
+                vehicleRepository,
+                fuelRepository,
+                availabilityService,
+                publisher,
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        service.updateFuelLevel("V1", 0, LocalDate.of(2026, 7, 1));
+
+        verify(publisher).notifyObservers(
+                eq("manager@test.com"), contains("no fuel")
+        );
+    }
+
+    @Test
+    void shouldNotNotifyWhenFuelLevelIsEnough() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        VehicleFuelRepository fuelRepository = mock(VehicleFuelRepository.class);
+        NotificationPublisher publisher = mock(NotificationPublisher.class);
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+        FuelRecord record = new FuelRecord("V1", 50);
+        when(vehicleRepository.findById("V1")).thenReturn(Optional.of(car));
+        when(fuelRepository.findByVehicleId("V1"))
+                .thenReturn(Optional.of(record));
+
+        FuelMonitoringService service = new FuelMonitoringService(
+                vehicleRepository,
+                fuelRepository,
+                mock(VehicleAvailabilityService.class),
+                publisher,
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        service.updateFuelLevel("V1", 50, LocalDate.of(2026, 7, 1));
+
+        verify(publisher, never()).notifyObservers(anyString(), anyString());
+    }
+
+    @Test
+    void shouldReturnDefaultFuelLevelWhenNoRecordExists() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        VehicleFuelRepository fuelRepository = mock(VehicleFuelRepository.class);
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+        when(vehicleRepository.findById("V1")).thenReturn(Optional.of(car));
+        when(fuelRepository.findByVehicleId("V1")).thenReturn(Optional.empty());
+
+        FuelMonitoringService service = new FuelMonitoringService(
+                vehicleRepository,
+                fuelRepository,
+                mock(VehicleAvailabilityService.class),
+                mock(NotificationPublisher.class),
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        assertEquals(100, service.getFuelLevel("V1"));
+    }
+
+    @Test
+    void shouldRejectNullFuelDate() {
+        FuelMonitoringService service = new FuelMonitoringService(
+                mock(VehicleRepository.class),
+                mock(VehicleFuelRepository.class),
+                mock(VehicleAvailabilityService.class),
+                mock(NotificationPublisher.class),
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.updateFuelLevel("V1", 50, null));
+    }
+
 }

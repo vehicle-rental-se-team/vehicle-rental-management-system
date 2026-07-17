@@ -65,4 +65,56 @@ class ReturnServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 service.returnVehicle("R1", LocalDate.of(2026, 6, 30)));
     }
+
+    @Test
+    void shouldReturnEmptyForClosedRental() {
+        RentalRepository rentalRepository = mock(RentalRepository.class);
+        Rental rental = createRental();
+        rental.close();
+        when(rentalRepository.findById("R1")).thenReturn(Optional.of(rental));
+
+        ReturnService service = new ReturnService(
+                rentalRepository,
+                mock(BillingService.class),
+                mock(AuthenticationService.class)
+        );
+
+        assertFalse(service.findActiveRental("R1").isPresent());
+    }
+
+    @Test
+    void shouldRejectNullReturnDate() {
+        ReturnService service = new ReturnService(
+                mock(RentalRepository.class),
+                mock(BillingService.class),
+                mock(AuthenticationService.class)
+        );
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.returnVehicle("R1", null));
+    }
+
+    @Test
+    void shouldKeepMaintenanceStatusAfterReturn() {
+        RentalRepository rentalRepository = mock(RentalRepository.class);
+        Rental rental = createRental();
+        rental.getVehicle().setStatus(VehicleStatus.MAINTENANCE);
+        when(rentalRepository.findById("R1")).thenReturn(Optional.of(rental));
+        BillingService billingService = mock(BillingService.class);
+        when(billingService.calculateTotalCost(
+                rental, LocalDate.of(2026, 7, 4)))
+                .thenReturn(150.0);
+
+        ReturnService service = new ReturnService(
+                rentalRepository,
+                billingService,
+                mock(AuthenticationService.class)
+        );
+
+        service.returnVehicle("R1", LocalDate.of(2026, 7, 4));
+
+        assertEquals(VehicleStatus.MAINTENANCE,
+                rental.getVehicle().getStatus());
+    }
+
 }

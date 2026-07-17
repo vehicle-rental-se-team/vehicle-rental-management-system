@@ -18,10 +18,16 @@ public class VehicleDocumentsRepository {
     private static final String DOCUMENTS_FILE_PATH =
             "data/vehicle_documents.txt";
 
+    private final String filePath;
     private final List<VehicleDocuments> documents;
 
     public VehicleDocumentsRepository() {
-        documents = new ArrayList<>();
+        this(DOCUMENTS_FILE_PATH);
+    }
+
+    public VehicleDocumentsRepository(String filePath) {
+        this.filePath = filePath;
+        this.documents = new ArrayList<>();
         createFileIfMissing();
         loadFromFile();
     }
@@ -44,7 +50,8 @@ public class VehicleDocumentsRepository {
             throw new IllegalArgumentException("Vehicle documents are required.");
         }
 
-        Optional<VehicleDocuments> existing = findByVehicleId(item.getVehicleId());
+        Optional<VehicleDocuments> existing =
+                findByVehicleId(item.getVehicleId());
 
         if (existing.isPresent()) {
             existing.get().updateDates(
@@ -60,7 +67,7 @@ public class VehicleDocumentsRepository {
 
     private void createFileIfMissing() {
         try {
-            File file = new File(DOCUMENTS_FILE_PATH);
+            File file = new File(filePath);
             File parent = file.getParentFile();
 
             if (parent != null && !parent.exists()) {
@@ -75,7 +82,7 @@ public class VehicleDocumentsRepository {
     }
 
     private void loadFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(DOCUMENTS_FILE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -101,7 +108,7 @@ public class VehicleDocumentsRepository {
     }
 
     private void saveToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DOCUMENTS_FILE_PATH))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (VehicleDocuments item : documents) {
                 writer.write(item.getVehicleId()
                         + "," + item.getRegistrationExpiryDate()

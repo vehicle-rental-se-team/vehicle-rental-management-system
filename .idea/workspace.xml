@@ -5,7 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f7f22478-e4e5-4fff-aeed-c2e75e88a082" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/vehicles.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/vehicles.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/MaintenanceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/MaintenanceRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/ManagerRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/ManagerRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/RentalRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/RentalRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/VehicleDocumentsRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/VehicleDocumentsRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/VehicleFuelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/VehicleFuelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/VehicleIncidentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/VehicleIncidentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/VehicleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vehiclerental/repository/VehicleRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/ElectricVehicleMonitoringServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/ElectricVehicleMonitoringServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/FuelMonitoringServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/FuelMonitoringServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/MaintenanceServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/MaintenanceServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/RentalServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/RentalServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/ReturnServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/ReturnServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/VehicleAvailabilityServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/VehicleAvailabilityServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/VehicleDocumentsServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/VehicleDocumentsServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/VehicleIncidentServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/VehicleIncidentServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/notification/NotificationPublisherTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vehiclerental/service/notification/NotificationPublisherTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,12 +46,12 @@
     &quot;assignee&quot;: &quot;momenaydi&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Ahmad150101/vehicle-rental-management-system.git",
-    "accountId": "b888b887-4d4e-461e-9e99-bc4fcc564281"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Ahmad150101/vehicle-rental-management-system.git&quot;,
+    &quot;accountId&quot;: &quot;78f19289-802f-49dc-bc8b-5bba7371c59c&quot;
   }
-}]]></component>
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -49,29 +67,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "JUnit.com.vehiclerental.service in vehicle-rental-management-system.executor": "Run",
-    "Maven.vehicle-rental-management-system [clean].executor": "Run",
-    "Maven.vehicle-rental-management-system [test].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "test3",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "terminal",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.All in vehicle-rental-management-system.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.com.vehiclerental.service in vehicle-rental-management-system.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.vehicle-rental-management-system [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.vehicle-rental-management-system [test].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.vehicle-rental-management-system [validate].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.vehicle-rental-management-system [verify].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;tests1&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\moham\Desktop\vehicle-rental-management-system\data" />
@@ -81,7 +102,7 @@
       <recent name="com.vehiclerental.service" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.com.vehiclerental.service in vehicle-rental-management-system">
+  <component name="RunManager" selected="JUnit.All in vehicle-rental-management-system">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.vehiclerental.presentation.Main" />
       <module name="vehicle-rental-management-system" />
@@ -91,6 +112,14 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in vehicle-rental-management-system" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="vehicle-rental-management-system" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -125,9 +154,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.All in vehicle-rental-management-system" />
+        <item itemvalue="Application.Main" />
         <item itemvalue="JUnit.com.vehiclerental.service in vehicle-rental-management-system" />
         <item itemvalue="JUnit.com.vehiclerental in vehicle-rental-management-system" />
-        <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
   </component>

@@ -82,4 +82,84 @@ class VehicleAvailabilityServiceTest {
                 null,
                 null);
     }
+
+    @Test
+    void shouldReturnUnavailableForLowFuel() {
+        RentalRepository rentalRepository = mock(RentalRepository.class);
+        VehicleFuelRepository fuelRepository = mock(VehicleFuelRepository.class);
+        when(rentalRepository.findActiveRentalByVehicleId("V1"))
+                .thenReturn(Optional.empty());
+        when(fuelRepository.findByVehicleId("V1"))
+                .thenReturn(Optional.of(
+                        new com.vehiclerental.domain.FuelRecord("V1", 10)
+                ));
+        VehicleAvailabilityService service = new VehicleAvailabilityService(
+                rentalRepository,
+                null,
+                null,
+                fuelRepository,
+                null
+        );
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+
+        assertEquals(VehicleStatus.UNAVAILABLE,
+                service.determineStatus(car, LocalDate.of(2026, 7, 1)));
+    }
+
+    @Test
+    void shouldReturnUnavailableForExpiredDocuments() {
+        RentalRepository rentalRepository = mock(RentalRepository.class);
+        VehicleDocumentsRepository documentsRepository = mock(VehicleDocumentsRepository.class);
+        when(rentalRepository.findActiveRentalByVehicleId("V1"))
+                .thenReturn(Optional.empty());
+        when(documentsRepository.findByVehicleId("V1"))
+                .thenReturn(Optional.of(
+                        new com.vehiclerental.domain.VehicleDocuments(
+                                "V1",
+                                LocalDate.of(2026, 7, 1),
+                                LocalDate.of(2027, 1, 1)
+                        )
+                ));
+        VehicleAvailabilityService service = new VehicleAvailabilityService(
+                rentalRepository,
+                null,
+                null,
+                null,
+                documentsRepository
+        );
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+
+        assertEquals(VehicleStatus.UNAVAILABLE,
+                service.determineStatus(car, LocalDate.of(2026, 7, 1)));
+    }
+
+    @Test
+    void shouldApplyStatusToVehicle() {
+        RentalRepository rentalRepository = mock(RentalRepository.class);
+        when(rentalRepository.findActiveRentalByVehicleId("V1"))
+                .thenReturn(Optional.empty());
+        VehicleAvailabilityService service = createService(rentalRepository);
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.UNAVAILABLE);
+
+        VehicleStatus status = service.applyStatus(
+                car, LocalDate.of(2026, 7, 1)
+        );
+
+        assertEquals(VehicleStatus.AVAILABLE, status);
+        assertEquals(VehicleStatus.AVAILABLE, car.getStatus());
+    }
+
+    @Test
+    void shouldRejectNullVehicleOrDate() {
+        VehicleAvailabilityService service = createService(
+                mock(RentalRepository.class)
+        );
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.determineStatus(null, LocalDate.of(2026, 7, 1)));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.determineStatus(car, null));
+    }
+
 }

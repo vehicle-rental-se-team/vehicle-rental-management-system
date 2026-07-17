@@ -18,9 +18,15 @@ public class VehicleIncidentRepository {
 
     private static final String INCIDENTS_FILE_PATH = "data/incidents.txt";
 
+    private final String filePath;
     private final List<VehicleIncident> incidents;
 
     public VehicleIncidentRepository() {
+        this(INCIDENTS_FILE_PATH);
+    }
+
+    public VehicleIncidentRepository(String filePath) {
+        this.filePath = filePath;
         this.incidents = new ArrayList<>();
         createIncidentsFileIfMissing();
         loadIncidentsFromFile();
@@ -100,7 +106,7 @@ public class VehicleIncidentRepository {
     }
 
     private void createIncidentsFileIfMissing() {
-        File incidentsFile = new File(INCIDENTS_FILE_PATH);
+        File incidentsFile = new File(filePath);
         File parentDirectory = incidentsFile.getParentFile();
 
         try {
@@ -113,14 +119,14 @@ public class VehicleIncidentRepository {
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not create incidents file: " + INCIDENTS_FILE_PATH,
+                    "Could not create incidents file: " + filePath,
                     exception
             );
         }
     }
 
     private void loadIncidentsFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(INCIDENTS_FILE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -130,7 +136,7 @@ public class VehicleIncidentRepository {
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not load incidents from file: " + INCIDENTS_FILE_PATH,
+                    "Could not load incidents from file: " + filePath,
                     exception
             );
         }
@@ -159,26 +165,26 @@ public class VehicleIncidentRepository {
     }
 
     private void saveAllIncidentsToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(INCIDENTS_FILE_PATH))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (VehicleIncident incident : incidents) {
                 writer.write(convertIncidentToLine(incident));
                 writer.newLine();
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not save incidents to file: " + INCIDENTS_FILE_PATH,
+                    "Could not save incidents to file: " + filePath,
                     exception
             );
         }
     }
 
     private String convertIncidentToLine(VehicleIncident incident) {
-        return incident.getId() + "," +
-                incident.getVehicleId() + "," +
-                incident.getType() + "," +
-                incident.getDate() + "," +
-                cleanText(incident.getDescription()) + "," +
-                incident.isInspectionCompleted();
+        return incident.getId() + ","
+                + incident.getVehicleId() + ","
+                + incident.getType() + ","
+                + incident.getDate() + ","
+                + cleanText(incident.getDescription()) + ","
+                + incident.isInspectionCompleted();
     }
 
     private String cleanText(String value) {

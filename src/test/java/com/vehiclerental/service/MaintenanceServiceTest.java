@@ -69,4 +69,88 @@ class MaintenanceServiceTest {
         verify(publisher).notifyObservers(
                 eq("manager@test.com"), contains("requires maintenance"));
     }
+
+    @Test
+    void shouldRejectDuplicateMaintenanceSchedule() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        MaintenanceRepository maintenanceRepository = mock(MaintenanceRepository.class);
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+        MaintenanceRecord record = new MaintenanceRecord(
+                "M1", "V1",
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 7, 1),
+                com.vehiclerental.domain.MaintenanceStatus.PENDING
+        );
+        when(vehicleRepository.findById("V1")).thenReturn(Optional.of(car));
+        when(maintenanceRepository.findPendingByVehicleId("V1"))
+                .thenReturn(Optional.of(record));
+
+        MaintenanceService service = new MaintenanceService(
+                vehicleRepository,
+                mock(RentalRepository.class),
+                maintenanceRepository,
+                mock(NotificationPublisher.class),
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        assertThrows(IllegalStateException.class, () ->
+                service.scheduleMaintenance(
+                        "V1", LocalDate.of(2026, 1, 1)
+                ));
+    }
+
+    @Test
+    void shouldMarkVehicleForMaintenanceOnDueDate() {
+        VehicleRepository vehicleRepository = mock(VehicleRepository.class);
+        RentalRepository rentalRepository = mock(RentalRepository.class);
+        MaintenanceRepository maintenanceRepository = mock(MaintenanceRepository.class);
+        NotificationPublisher publisher = mock(NotificationPublisher.class);
+        Car car = new Car("V1", "Toyota", "Corolla", 50, VehicleStatus.AVAILABLE);
+        MaintenanceRecord record = new MaintenanceRecord(
+                "M1", "V1",
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 7, 1),
+                com.vehiclerental.domain.MaintenanceStatus.PENDING
+        );
+        when(maintenanceRepository.findAll())
+                .thenReturn(Collections.singletonList(record));
+        when(vehicleRepository.findById("V1")).thenReturn(Optional.of(car));
+        when(rentalRepository.findActiveRentalByVehicleId("V1"))
+                .thenReturn(Optional.empty());
+
+        MaintenanceService service = new MaintenanceService(
+                vehicleRepository,
+                rentalRepository,
+                maintenanceRepository,
+                publisher,
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        int count = service.checkMaintenance(LocalDate.of(2026, 7, 1));
+
+        assertEquals(1, count);
+        assertEquals(VehicleStatus.MAINTENANCE, car.getStatus());
+        verify(vehicleRepository).updateVehicle(car);
+        verify(publisher).notifyObservers(
+                eq("manager@test.com"), contains("due for maintenance today")
+        );
+    }
+
+    @Test
+    void shouldRejectNullDateWhenCheckingMaintenance() {
+        MaintenanceService service = new MaintenanceService(
+                mock(VehicleRepository.class),
+                mock(RentalRepository.class),
+                mock(MaintenanceRepository.class),
+                mock(NotificationPublisher.class),
+                mock(AuthenticationService.class),
+                "manager@test.com"
+        );
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.checkMaintenance(null));
+    }
+
 }
