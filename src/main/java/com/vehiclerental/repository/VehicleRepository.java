@@ -21,15 +21,21 @@ public class VehicleRepository {
 
     private static final String VEHICLES_FILE_PATH = "data/vehicles.txt";
 
+    private final String filePath;
     private final List<Vehicle> vehicles;
 
     public VehicleRepository() {
+        this(VEHICLES_FILE_PATH);
+    }
+
+    public VehicleRepository(String filePath) {
+        this.filePath = filePath;
         this.vehicles = new ArrayList<>();
         loadVehiclesFromFile();
     }
 
     private void loadVehiclesFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(VEHICLES_FILE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -38,7 +44,10 @@ public class VehicleRepository {
                 }
             }
         } catch (IOException exception) {
-            throw new RuntimeException("Could not load vehicles from file: " + VEHICLES_FILE_PATH, exception);
+            throw new RuntimeException(
+                    "Could not load vehicles from file: " + filePath,
+                    exception
+            );
         }
     }
 
@@ -68,10 +77,14 @@ public class VehicleRepository {
             case "ELECTRIC":
             case "ELECTRIC_VEHICLE":
                 if (parts.length < 7) {
-                    throw new IllegalArgumentException("Battery level is required for electric vehicle: " + line);
+                    throw new IllegalArgumentException(
+                            "Battery level is required for electric vehicle: " + line
+                    );
                 }
                 int batteryLevel = Integer.parseInt(parts[6].trim());
-                return new ElectricVehicle(id, brand, model, dailyRate, status, batteryLevel);
+                return new ElectricVehicle(
+                        id, brand, model, dailyRate, status, batteryLevel
+                );
             default:
                 throw new IllegalArgumentException("Unknown vehicle type: " + type);
         }
@@ -111,20 +124,25 @@ public class VehicleRepository {
         }
 
         if (!findById(vehicle.getId()).isPresent()) {
-            throw new IllegalArgumentException("Vehicle does not exist: " + vehicle.getId());
+            throw new IllegalArgumentException(
+                    "Vehicle does not exist: " + vehicle.getId()
+            );
         }
 
         saveVehiclesToFile();
     }
 
     private void saveVehiclesToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(VEHICLES_FILE_PATH))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Vehicle vehicle : vehicles) {
                 writer.write(convertVehicleToLine(vehicle));
                 writer.newLine();
             }
         } catch (IOException exception) {
-            throw new RuntimeException("Could not save vehicles to file: " + VEHICLES_FILE_PATH, exception);
+            throw new RuntimeException(
+                    "Could not save vehicles to file: " + filePath,
+                    exception
+            );
         }
     }
 
@@ -137,8 +155,7 @@ public class VehicleRepository {
                 + "," + vehicle.getStatus();
 
         if (vehicle instanceof ElectricVehicle) {
-            ElectricVehicle electricVehicle = (ElectricVehicle) vehicle;
-            line += "," + electricVehicle.getBatteryLevel();
+            line += "," + ((ElectricVehicle) vehicle).getBatteryLevel();
         }
 
         return line;

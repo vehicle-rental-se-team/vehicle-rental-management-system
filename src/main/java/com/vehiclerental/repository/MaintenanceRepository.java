@@ -18,9 +18,15 @@ public class MaintenanceRepository {
 
     private static final String MAINTENANCE_FILE_PATH = "data/maintenance.txt";
 
+    private final String filePath;
     private final List<MaintenanceRecord> records;
 
     public MaintenanceRepository() {
+        this(MAINTENANCE_FILE_PATH);
+    }
+
+    public MaintenanceRepository(String filePath) {
+        this.filePath = filePath;
         this.records = new ArrayList<>();
         createMaintenanceFileIfMissing();
         loadRecordsFromFile();
@@ -63,7 +69,7 @@ public class MaintenanceRepository {
     }
 
     private void createMaintenanceFileIfMissing() {
-        File maintenanceFile = new File(MAINTENANCE_FILE_PATH);
+        File maintenanceFile = new File(filePath);
         File parentDirectory = maintenanceFile.getParentFile();
 
         try {
@@ -76,16 +82,14 @@ public class MaintenanceRepository {
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not create maintenance file: " + MAINTENANCE_FILE_PATH,
+                    "Could not create maintenance file: " + filePath,
                     exception
             );
         }
     }
 
     private void loadRecordsFromFile() {
-        try (BufferedReader reader = new BufferedReader(
-                new FileReader(MAINTENANCE_FILE_PATH))) {
-
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -95,8 +99,7 @@ public class MaintenanceRepository {
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not load maintenance records from file: "
-                            + MAINTENANCE_FILE_PATH,
+                    "Could not load maintenance records from file: " + filePath,
                     exception
             );
         }
@@ -119,17 +122,14 @@ public class MaintenanceRepository {
     }
 
     private void saveAllRecordsToFile() {
-        try (BufferedWriter writer = new BufferedWriter(
-                new FileWriter(MAINTENANCE_FILE_PATH))) {
-
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (MaintenanceRecord record : records) {
                 writer.write(convertRecordToLine(record));
                 writer.newLine();
             }
         } catch (IOException exception) {
             throw new RuntimeException(
-                    "Could not save maintenance records to file: "
-                            + MAINTENANCE_FILE_PATH,
+                    "Could not save maintenance records to file: " + filePath,
                     exception
             );
         }

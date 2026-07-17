@@ -13,25 +13,33 @@ public class ManagerRepository {
 
     private static final String MANAGERS_FILE_PATH = "data/managers.txt";
 
+    private final String filePath;
     private final List<Manager> managers;
 
     public ManagerRepository() {
+        this(MANAGERS_FILE_PATH);
+    }
+
+    public ManagerRepository(String filePath) {
+        this.filePath = filePath;
         this.managers = new ArrayList<>();
         loadManagersFromFile();
     }
 
     private void loadManagersFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(MANAGERS_FILE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
                 if (!line.trim().isEmpty()) {
-                    Manager manager = convertLineToManager(line);
-                    managers.add(manager);
+                    managers.add(convertLineToManager(line));
                 }
             }
         } catch (IOException exception) {
-            throw new RuntimeException("Could not load managers from file: " + MANAGERS_FILE_PATH, exception);
+            throw new RuntimeException(
+                    "Could not load managers from file: " + filePath,
+                    exception
+            );
         }
     }
 
@@ -42,10 +50,7 @@ public class ManagerRepository {
             throw new IllegalArgumentException("Invalid manager data: " + line);
         }
 
-        String username = parts[0].trim();
-        String password = parts[1].trim();
-
-        return new Manager(username, password);
+        return new Manager(parts[0].trim(), parts[1].trim());
     }
 
     public Optional<Manager> findByUsername(String username) {

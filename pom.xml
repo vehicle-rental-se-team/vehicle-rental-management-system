@@ -33,9 +33,9 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -46,6 +46,13 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>${jacoco.version}</version>
+
+        <configuration>
+          <excludes>
+            <exclude>com/vehiclerental/presentation/**</exclude>
+          </excludes>
+        </configuration>
+
         <executions>
           <execution>
             <goals>
@@ -62,7 +69,7 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
-
 </project>
