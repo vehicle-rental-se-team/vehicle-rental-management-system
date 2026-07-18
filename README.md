@@ -229,6 +229,6 @@ README.md
 ## Team Members
 
 
--AhmadJanem- 12323838
-- Momen - University ID
+- Ahmad Janem- 12323838
+- Momen Aydi-12323763
 - Omar robo` - 12324547
