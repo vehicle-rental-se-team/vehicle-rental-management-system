@@ -1,0 +1,26 @@
+@startuml
+title com.vehiclerental.exception - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.exception" {
+  class "InvalidRentalPeriodException" as C17 {
+    + InvalidRentalPeriodException(String message)
+  }
+  class "RentalAlreadyExistsException" as C18 {
+    + RentalAlreadyExistsException(String message)
+  }
+  class "UnauthorizedAccessException" as C19 {
+    + UnauthorizedAccessException(String message)
+  }
+  class "VehicleNotAvailableException" as C20 {
+    + VehicleNotAvailableException(String message)
+  }
+  class "VehicleNotFoundException" as C21 {
+    + VehicleNotFoundException(String message)
+  }
+}
+
+@enduml

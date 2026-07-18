@@ -1,0 +1,9 @@
+com.vehiclerental.domain
+com.vehiclerental.exception
+com.vehiclerental.presentation
+com.vehiclerental.presentation.gui
+com.vehiclerental.repository
+com.vehiclerental.service
+com.vehiclerental.service.notification
+com.vehiclerental.service.reminder
+com.vehiclerental.strategy

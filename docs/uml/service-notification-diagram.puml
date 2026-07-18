@@ -1,0 +1,41 @@
+@startuml
+title com.vehiclerental.service.notification - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.service.notification" {
+  class "EmailNotificationObserver" as C58 {
+    - notificationService : NotificationService
+    --
+    + EmailNotificationObserver(NotificationService notificationService)
+  }
+  class "EmailNotificationService" as C59 {
+  }
+  class "NotificationLogObserver" as C60 {
+    - List<String> messages = new ArrayList<>()
+    + List<String> getMessages()
+    + void clear()
+  }
+  interface "NotificationObserver" as C61 {
+    ~ void update(String recipient, String message)
+  }
+  class "NotificationPublisher" as C62 {
+    - List<NotificationObserver> observers = new ArrayList<>()
+    + void addObserver(NotificationObserver observer)
+    + void removeObserver(NotificationObserver observer)
+    + void notifyObservers(String recipient, String message)
+    + int getObserverCount()
+  }
+  interface "NotificationService" as C63 {
+    ~ void sendNotification(String recipient, String message)
+  }
+}
+
+C61 <|.. C58
+C63 <|.. C59
+C61 <|.. C60
+C58 --> "1" C63
+
+@enduml

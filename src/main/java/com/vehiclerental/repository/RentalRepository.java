@@ -16,18 +16,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Stores rental data in memory and in a text file.
+ */
 public class RentalRepository {
 
+    /** Default path of the rentals data file. */
     private static final String RENTALS_FILE_PATH = "data/rentals.txt";
 
+    /** Path of the file used by this repository. */
     private final String filePath;
+    /** List of rentals currently loaded in memory. */
     private final List<Rental> rentals;
+    /** Repository used to connect rental records with vehicles. */
     private final VehicleRepository vehicleRepository;
 
+    /**
+     * Creates the repository using the default rentals file.
+     *
+     * @param vehicleRepository the vehicle repository
+     */
     public RentalRepository(VehicleRepository vehicleRepository) {
         this(RENTALS_FILE_PATH, vehicleRepository);
     }
 
+    /**
+     * Creates the repository using a selected file path.
+     *
+     * @param filePath the rentals file path
+     * @param vehicleRepository the vehicle repository
+     * @throws IllegalArgumentException when the vehicle repository is missing
+     */
     public RentalRepository(
             String filePath,
             VehicleRepository vehicleRepository) {
@@ -43,6 +62,11 @@ public class RentalRepository {
         loadRentalsFromFile();
     }
 
+    /**
+     * Adds a rental and saves all rentals to the file.
+     *
+     * @param rental the rental to save
+     */
     public void save(Rental rental) {
         if (rental == null) {
             throw new IllegalArgumentException("Rental is required.");
@@ -52,6 +76,11 @@ public class RentalRepository {
         saveAllRentalsToFile();
     }
 
+    /**
+     * Saves the current rental list after a rental is changed.
+     *
+     * @param rental the changed rental
+     */
     public void update(Rental rental) {
         if (rental == null) {
             throw new IllegalArgumentException("Rental is required.");
@@ -60,6 +89,12 @@ public class RentalRepository {
         saveAllRentalsToFile();
     }
 
+    /**
+     * Searches for a rental by id.
+     *
+     * @param id the rental id
+     * @return the rental when found
+     */
     public Optional<Rental> findById(String id) {
         for (Rental rental : rentals) {
             if (rental.getId().equals(id)) {
@@ -70,6 +105,12 @@ public class RentalRepository {
         return Optional.empty();
     }
 
+    /**
+     * Searches for an active rental for a vehicle.
+     *
+     * @param vehicleId the vehicle id
+     * @return the active rental when found
+     */
     public Optional<Rental> findActiveRentalByVehicleId(String vehicleId) {
         for (Rental rental : rentals) {
             if (rental.isActive()
@@ -81,10 +122,18 @@ public class RentalRepository {
         return Optional.empty();
     }
 
+    /**
+     * Returns a copy of all rentals.
+     *
+     * @return all rentals
+     */
     public List<Rental> findAll() {
         return new ArrayList<>(rentals);
     }
 
+    /**
+     * Creates the rentals file and its parent folder when needed.
+     */
     private void createRentalsFileIfMissing() {
         File rentalsFile = new File(filePath);
         File parentDirectory = rentalsFile.getParentFile();
@@ -105,6 +154,9 @@ public class RentalRepository {
         }
     }
 
+    /**
+     * Loads rental records from the text file.
+     */
     private void loadRentalsFromFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -127,6 +179,12 @@ public class RentalRepository {
         }
     }
 
+    /**
+     * Converts one file line into a rental object.
+     *
+     * @param line one rental line from the file
+     * @return the converted rental
+     */
     private Rental convertLineToRental(String line) {
         String[] parts = line.split(",", -1);
 
@@ -164,6 +222,9 @@ public class RentalRepository {
         );
     }
 
+    /**
+     * Writes all rentals to the text file.
+     */
     private void saveAllRentalsToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Rental rental : rentals) {
@@ -178,6 +239,12 @@ public class RentalRepository {
         }
     }
 
+    /**
+     * Converts a rental into one line for the data file.
+     *
+     * @param rental the rental to convert
+     * @return the rental as one text line
+     */
     private String convertRentalToLine(Rental rental) {
         return rental.getId() + ","
                 + rental.getVehicle().getId() + ","
@@ -189,6 +256,12 @@ public class RentalRepository {
                 + rental.isActive();
     }
 
+    /**
+     * Removes commas from values before writing them to the file.
+     *
+     * @param value the text to clean
+     * @return the cleaned text
+     */
     private String cleanText(String value) {
         return value.replace(",", " ").trim();
     }

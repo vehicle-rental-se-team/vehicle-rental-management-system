@@ -1,0 +1,127 @@
+@startuml
+title com.vehiclerental.repository - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.repository" {
+  class "MaintenanceRepository" as C38 {
+    - MAINTENANCE_FILE_PATH : String
+    - filePath : String
+    - records : List<MaintenanceRecord>
+    --
+    + MaintenanceRepository()
+    + MaintenanceRepository(String filePath)
+    + void save(MaintenanceRecord record)
+    + void update(MaintenanceRecord record)
+    + Optional<MaintenanceRecord> findPendingByVehicleId(String vehicleId)
+    + List<MaintenanceRecord> findAll()
+    - void createMaintenanceFileIfMissing()
+    - void loadRecordsFromFile()
+    - MaintenanceRecord convertLineToRecord(String line)
+    - void saveAllRecordsToFile()
+    - String convertRecordToLine(MaintenanceRecord record)
+  }
+  class "ManagerRepository" as C39 {
+    - MANAGERS_FILE_PATH : String
+    - filePath : String
+    - managers : List<Manager>
+    --
+    + ManagerRepository()
+    + ManagerRepository(String filePath)
+    - void loadManagersFromFile()
+    - Manager convertLineToManager(String line)
+    + Optional<Manager> findByUsername(String username)
+    + void addManager(Manager manager)
+  }
+  class "RentalRepository" as C40 {
+    - RENTALS_FILE_PATH : String
+    - filePath : String
+    - rentals : List<Rental>
+    - vehicleRepository : VehicleRepository
+    --
+    + RentalRepository(VehicleRepository vehicleRepository)
+    + RentalRepository( String filePath, VehicleRepository vehicleRepository)
+    + void save(Rental rental)
+    + void update(Rental rental)
+    + Optional<Rental> findById(String id)
+    + Optional<Rental> findActiveRentalByVehicleId(String vehicleId)
+    + List<Rental> findAll()
+    - void createRentalsFileIfMissing()
+    - void loadRentalsFromFile()
+    - Rental convertLineToRental(String line)
+    - void saveAllRentalsToFile()
+    - String convertRentalToLine(Rental rental)
+    - String cleanText(String value)
+  }
+  class "VehicleDocumentsRepository" as C41 {
+    - DOCUMENTS_FILE_PATH : String
+    - filePath : String
+    - documents : List<VehicleDocuments>
+    --
+    + VehicleDocumentsRepository()
+    + VehicleDocumentsRepository(String filePath)
+    + Optional<VehicleDocuments> findByVehicleId(String vehicleId)
+    + List<VehicleDocuments> findAll()
+    + void saveOrUpdate(VehicleDocuments item)
+    - void createFileIfMissing()
+    - void loadFromFile()
+    - void saveToFile()
+  }
+  class "VehicleFuelRepository" as C42 {
+    - FUEL_FILE_PATH : String
+    - filePath : String
+    - records : List<FuelRecord>
+    --
+    + VehicleFuelRepository()
+    + VehicleFuelRepository(String filePath)
+    + Optional<FuelRecord> findByVehicleId(String vehicleId)
+    + List<FuelRecord> findAll()
+    + void saveOrUpdate(FuelRecord record)
+    - void createFileIfMissing()
+    - void loadFromFile()
+    - void saveToFile()
+  }
+  class "VehicleIncidentRepository" as C43 {
+    - INCIDENTS_FILE_PATH : String
+    - filePath : String
+    - incidents : List<VehicleIncident>
+    --
+    + VehicleIncidentRepository()
+    + VehicleIncidentRepository(String filePath)
+    + void save(VehicleIncident incident)
+    + void update(VehicleIncident incident)
+    + Optional<VehicleIncident> findById(String incidentId)
+    + List<VehicleIncident> findByVehicleId(String vehicleId)
+    + List<VehicleIncident> findPendingAccidentsByVehicleId(String vehicleId)
+    + boolean hasPendingAccident(String vehicleId)
+    + List<VehicleIncident> findAll()
+    - void createIncidentsFileIfMissing()
+    - void loadIncidentsFromFile()
+    - VehicleIncident convertLineToIncident(String line)
+    - void saveAllIncidentsToFile()
+    - String convertIncidentToLine(VehicleIncident incident)
+    - String cleanText(String value)
+  }
+  class "VehicleRepository" as C44 {
+    - VEHICLES_FILE_PATH : String
+    - filePath : String
+    - vehicles : List<Vehicle>
+    --
+    + VehicleRepository()
+    + VehicleRepository(String filePath)
+    - void loadVehiclesFromFile()
+    - Vehicle convertLineToVehicle(String line)
+    + List<Vehicle> findAll()
+    + Optional<Vehicle> findById(String id)
+    + void addVehicle(Vehicle vehicle)
+    + void updateVehicle(Vehicle vehicle)
+    - void saveVehiclesToFile()
+    - String convertVehicleToLine(Vehicle vehicle)
+  }
+}
+
+C40 --> "1" C44
+
+@enduml

@@ -1,0 +1,326 @@
+@startuml
+title com.vehiclerental.presentation.gui - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.presentation.gui" {
+  class "AppContext" as C23 {
+    - MANAGER_NOTIFICATION_EMAIL : String
+    - managerRepository : ManagerRepository
+    - vehicleRepository : VehicleRepository
+    - rentalRepository : RentalRepository
+    - maintenanceRepository : MaintenanceRepository
+    - vehicleIncidentRepository : VehicleIncidentRepository
+    - vehicleFuelRepository : VehicleFuelRepository
+    - vehicleDocumentsRepository : VehicleDocumentsRepository
+    - authenticationService : AuthenticationService
+    - vehicleCatalogService : VehicleCatalogService
+    - rentalService : RentalService
+    - billingService : BillingService
+    - returnService : ReturnService
+    - notificationService : NotificationService
+    - notificationPublisher : NotificationPublisher
+    - notificationLogObserver : NotificationLogObserver
+    - rentalReminderService : RentalReminderService
+    - electricVehicleMonitoringService : ElectricVehicleMonitoringService
+    - vehicleIncidentService : VehicleIncidentService
+    - maintenanceService : MaintenanceService
+    - vehicleAvailabilityService : VehicleAvailabilityService
+    - fuelMonitoringService : FuelMonitoringService
+    - vehicleDocumentsService : VehicleDocumentsService
+    - vehicleHistoryService : VehicleHistoryService
+    - vehicleManagementService : VehicleManagementService
+    --
+    + AppContext()
+    + AuthenticationService getAuthenticationService()
+    + VehicleCatalogService getVehicleCatalogService()
+    + RentalService getRentalService()
+    + RentalRepository getRentalRepository()
+    + BillingService getBillingService()
+    + ReturnService getReturnService()
+    + NotificationPublisher getNotificationPublisher()
+    + NotificationLogObserver getNotificationLogObserver()
+    + RentalReminderService getRentalReminderService()
+    + ElectricVehicleMonitoringService getElectricVehicleMonitoringService()
+    + VehicleIncidentRepository getVehicleIncidentRepository()
+    + VehicleIncidentService getVehicleIncidentService()
+    + MaintenanceRepository getMaintenanceRepository()
+    + MaintenanceService getMaintenanceService()
+    + VehicleFuelRepository getVehicleFuelRepository()
+    + VehicleDocumentsRepository getVehicleDocumentsRepository()
+    + FuelMonitoringService getFuelMonitoringService()
+    + VehicleDocumentsService getVehicleDocumentsService()
+    + VehicleHistoryService getVehicleHistoryService()
+    + VehicleManagementService getVehicleManagementService()
+    + VehicleAvailabilityService getVehicleAvailabilityService()
+  }
+  class "BillingPanel" as C24 {
+    - appContext : AppContext
+    - tableModel : DefaultTableModel
+    - rentalTable : JTable
+    - returnDateField : JTextField
+    - statusLabel : JLabel
+    --
+    + BillingPanel(AppContext appContext)
+    - JPanel createTopPanel()
+    - void loadRentals()
+    - void calculateSelectedBill()
+  }
+  class "DashboardPanel" as C25 {
+    - appContext : AppContext
+    - totalVehiclesValue : JLabel
+    - availableVehiclesValue : JLabel
+    - activeRentalsValue : JLabel
+    - pendingActionsValue : JLabel
+    - notificationArea : JTextArea
+    --
+    + DashboardPanel(AppContext appContext)
+    - JPanel createStatsPanel()
+    - JPanel createCenterPanel()
+    - JPanel createProjectStatusCard()
+    - JPanel createNotificationCard()
+    - JPanel createActionsPanel()
+    - JPanel createStatusItem(String title, String text)
+    - JPanel createStatCard(String title, JLabel valueLabel, String subtitle)
+    - JLabel createValueLabel()
+    - void runSystemChecks()
+    - void refreshNotifications()
+  }
+  class "IncidentManagementPanel" as C26 {
+    - appContext : AppContext
+    - vehicleComboBox : JComboBox<String>
+    - typeComboBox : JComboBox<IncidentType>
+    - dateField : JTextField
+    - descriptionField : JTextField
+    - statusLabel : JLabel
+    - tableModel : DefaultTableModel
+    - incidentTable : JTable
+    --
+    + IncidentManagementPanel(AppContext appContext)
+    - JPanel createFormCard()
+    - void recordIncident()
+    - void completeInspection()
+    - void selectVehicleFromTable()
+    - void showWarning(String message)
+    - void showError(String message)
+  }
+  class "LoginFrame" as C27 {
+    - appContext : AppContext
+    - application : VehicleRentalApplication
+    - usernameField : JTextField
+    - passwordField : JPasswordField
+    --
+    + LoginFrame(AppContext appContext, VehicleRentalApplication application)
+    - JPanel createBrandPanel()
+    - JPanel createLoginPanel()
+    - void login()
+  }
+  class "MainFrame" as C28 {
+    - DASHBOARD : String
+    - VEHICLES : String
+    - RENTALS : String
+    - RETURNS : String
+    - BILLING : String
+    - MANAGEMENT : String
+    - INCIDENTS : String
+    - MAINTENANCE : String
+    - appContext : AppContext
+    - application : VehicleRentalApplication
+    - cardLayout : CardLayout
+    - contentPanel : JPanel
+    - pageTitle : JLabel
+    - pageSubtitle : JLabel
+    - menuButtons : Map<String, JButton>
+    - pages : Map<String, JPanel>
+    --
+    + MainFrame(AppContext appContext, VehicleRentalApplication application)
+    - JPanel createSidebar()
+    - JPanel createBrandPanel()
+    - JPanel createMainArea()
+    - void registerPage(String key, JPanel panel)
+    - void addMenuButton(JPanel menu, String pageKey, String label)
+    - void showPage(String pageKey)
+    - void updateHeader(String pageKey)
+    - void updateActiveMenu(String activePage)
+  }
+  class "MaintenanceManagementPanel" as C29 {
+    - appContext : AppContext
+    - vehicleComboBox : JComboBox<String>
+    - lastMaintenanceField : JTextField
+    - completionDateField : JTextField
+    - checkDateField : JTextField
+    - statusLabel : JLabel
+    - tableModel : DefaultTableModel
+    - maintenanceTable : JTable
+    --
+    + MaintenanceManagementPanel(AppContext appContext)
+    - JPanel createControlsCard()
+    - void scheduleMaintenance()
+    - void completeMaintenance()
+    - void runMaintenanceCheck()
+    - void selectVehicleFromTable()
+    - void showWarning(String message)
+    - void showError(String message)
+  }
+  interface "RefreshablePanel" as C30 {
+    ~ void refreshData()
+  }
+  class "RentalPanel" as C31 {
+    - MAX_RENTAL_DAYS : int
+    - appContext : AppContext
+    - vehicleTableModel : VehicleTableModel
+    - vehicleTable : JTable
+    - customerNameField : JTextField
+    - customerEmailField : JTextField
+    - customerAgeField : JTextField
+    - specialLicenseCheckBox : JCheckBox
+    - startDateField : JTextField
+    - endDateField : JTextField
+    - statusLabel : JLabel
+    --
+    + RentalPanel(AppContext appContext)
+    - JPanel createFormCard()
+    - JPanel createTableCard()
+    - void loadAvailableVehicles()
+    - void prepareRental()
+    - void clearForm()
+    - void showWarning(String message, String title)
+    - Vehicle getSelectedVehicle()
+  }
+  class "ReturnPanel" as C32 {
+    - appContext : AppContext
+    - tableModel : DefaultTableModel
+    - rentalTable : JTable
+    - returnDateField : JTextField
+    - statusLabel : JLabel
+    --
+    + ReturnPanel(AppContext appContext)
+    - JPanel createTopPanel()
+    - void loadActiveRentals()
+    - void returnSelectedRental()
+  }
+  class "UiTheme" as C33 {
+    + Color BACKGROUND = new Color(8, 20, 40)
+    + Color SURFACE = new Color(14, 30, 56)
+    + Color SURFACE_ALT = new Color(20, 40, 72)
+    + Color PRIMARY = new Color(212, 175, 55)
+    + Color PRIMARY_DARK = new Color(160, 125, 30)
+    + Color PRIMARY_LIGHT = new Color(245, 210, 90)
+    + Color SIDEBAR = new Color(5, 14, 30)
+    + Color SIDEBAR_ACTIVE = new Color(23, 45, 82)
+    + Color TEXT = new Color(238, 247, 255)
+    + Color MUTED = new Color(175, 198, 225)
+    + Color BORDER = new Color(55, 85, 130)
+    + Color SUCCESS = new Color(75, 180, 110)
+    + Color ERROR = new Color(210, 85, 85)
+    + Color INPUT_BACKGROUND = new Color(10, 24, 46)
+    - UiTheme()
+    + void applyGlobalTheme()
+    + void stylePrimaryButton(JButton button)
+    + void styleSecondaryButton(JButton button)
+    + void styleSidebarButton(JButton button)
+    + void styleActiveSidebarButton(JButton button)
+    + void styleTextField(JTextField field)
+    + void stylePasswordField(JPasswordField field)
+    + <T> void styleComboBox(JComboBox<T> comboBox)
+    + void styleTable(JTable table)
+    + JLabel titleLabel(String text)
+    + JLabel subtitleLabel(String text)
+    + JPanel cardPanel()
+    + JLabel logoImageLabel(String path, int width, int height)
+    + void styleLabelAsBrand(JLabel label)
+    + void styleMutedLabel(JLabel label)
+    - void resetButtonLook(JButton button)
+    - Border compoundInputBorder()
+    - void addButtonAnimation( JButton button, Color normalBackground, Color hoverBackground, Color normalForeground, Color hoverForeground )
+    - void animateButton(JButton button, Color targetBackground, Color targetForeground)
+    - Color blend(Color start, Color end, float ratio)
+  }
+  class "VehicleCatalogPanel" as C34 {
+    - appContext : AppContext
+    - tableModel : VehicleTableModel
+    - table : JTable
+    - searchField : JTextField
+    - countLabel : JLabel
+    - sorter : TableRowSorter<VehicleTableModel>
+    --
+    + VehicleCatalogPanel(AppContext appContext)
+    - JPanel createToolbar()
+    - JPanel createTableCard()
+    - void loadAvailableVehicles()
+    - void applySearch()
+    - void clearSearch()
+  }
+  class "VehicleManagementPanel" as C35 {
+    - appContext : AppContext
+    - vehicleComboBox : JComboBox<String>
+    - vehicleInfoLabel : JLabel
+    - energyLabel : JLabel
+    - energyField : JTextField
+    - registrationField : JTextField
+    - insuranceField : JTextField
+    - historyArea : JTextArea
+    --
+    + VehicleManagementPanel(AppContext appContext)
+    - JPanel createVehicleSelectionCard()
+    - JPanel createManagementCards()
+    - JPanel createEnergyCard()
+    - JPanel createDocumentsCard()
+    - JPanel createHistoryCard()
+    - void showAddVehicleDialog()
+    - void updateEnergyLevel()
+    - void updateDocuments()
+    - void refreshSelectedVehicle()
+    - void loadHistory()
+    - Vehicle getSelectedVehicle()
+    - void styleHistoryArea()
+    - void showWarning(String message)
+    - void showError(String message)
+  }
+  class "VehicleRentalApplication" as C36 {
+    - appContext : AppContext
+    --
+    + VehicleRentalApplication()
+    + void start()
+    + void showLoginWindow()
+    + void showMainWindow()
+    + void logout(MainFrame mainFrame)
+    - void configureLookAndFeel()
+  }
+  class "VehicleTableModel" as C37 {
+    - columns : String[]
+    - vehicles : List<Vehicle>
+    --
+    + VehicleTableModel()
+    + void setVehicles(List<Vehicle> vehicles)
+    + Vehicle getVehicleAt(int rowIndex)
+  }
+}
+
+C30 <|.. C24
+C30 <|.. C25
+C30 <|.. C26
+C30 <|.. C29
+C30 <|.. C31
+C30 <|.. C32
+C30 <|.. C34
+C30 <|.. C35
+C24 --> "1" C23
+C25 --> "1" C23
+C26 --> "1" C23
+C27 --> "1" C23
+C27 --> "1" C36
+C28 --> "1" C23
+C28 --> "1" C36
+C29 --> "1" C23
+C31 --> "1" C23
+C31 --> "1" C37
+C32 --> "1" C23
+C34 --> "1" C23
+C34 --> "1" C37
+C35 --> "1" C23
+C36 --> "1" C23
+
+@enduml

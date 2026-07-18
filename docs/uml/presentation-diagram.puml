@@ -1,0 +1,14 @@
+@startuml
+title com.vehiclerental.presentation - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.presentation" {
+  class "Main" as C22 {
+    + void main(String[] args)
+  }
+}
+
+@enduml
