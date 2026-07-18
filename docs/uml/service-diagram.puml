@@ -1,0 +1,240 @@
+@startuml
+title com.vehiclerental.service - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.service" {
+  class "AuthenticationService" as C45 {
+    - managerRepository : ManagerRepository
+    - loggedInManager : Manager
+    --
+    + AuthenticationService(ManagerRepository managerRepository)
+    + boolean login(String username, String password)
+    + void logout()
+    + boolean isLoggedIn()
+    + Manager getLoggedInManager()
+    + void requireLogin()
+  }
+  class "BillingService" as C46 {
+    - latePenaltyPerDay : double
+    --
+    + BillingService(double latePenaltyPerDay)
+    + double calculateBaseCost(Rental rental)
+    + long calculateLateDays(Rental rental, LocalDate actualReturnDate)
+    + double calculateLatePenalty(Rental rental, LocalDate actualReturnDate)
+    + double calculateTotalCost(Rental rental, LocalDate actualReturnDate)
+  }
+  class "ElectricVehicleMonitoringService" as C47 {
+    - LOW_BATTERY_LEVEL : int
+    - vehicleRepository : VehicleRepository
+    - rentalRepository : RentalRepository
+    - notificationPublisher : NotificationPublisher
+    - notificationRecipient : String
+    - availabilityService : VehicleAvailabilityService
+    --
+    + ElectricVehicleMonitoringService( VehicleRepository vehicleRepository, RentalRepository rentalRepository, NotificationPublisher notificationPublisher, String notificationRecipient)
+    + ElectricVehicleMonitoringService( VehicleRepository vehicleRepository, RentalRepository rentalRepository, NotificationPublisher notificationPublisher, String notificationRecipient, VehicleAvailabilityService availabilityService)
+    + void updateBatteryLevel(String vehicleId, int batteryLevel)
+    + boolean isBatteryLow(ElectricVehicle vehicle)
+    + boolean isBatteryEmpty(ElectricVehicle vehicle)
+    - void updateVehicleStatus( ElectricVehicle vehicle, boolean hasActiveRental)
+    - void sendBatteryNotification( ElectricVehicle vehicle, boolean hasActiveRental)
+    - void sendLowBatteryNotification(ElectricVehicle vehicle)
+    - void sendEmptyBatteryNotification( ElectricVehicle vehicle, boolean hasActiveRental)
+  }
+  class "FuelMonitoringService" as C48 {
+    - LOW_FUEL_LEVEL : int
+    - vehicleRepository : VehicleRepository
+    - fuelRepository : VehicleFuelRepository
+    - availabilityService : VehicleAvailabilityService
+    - notificationPublisher : NotificationPublisher
+    - authenticationService : AuthenticationService
+    - notificationRecipient : String
+    --
+    + FuelMonitoringService( VehicleRepository vehicleRepository, VehicleFuelRepository fuelRepository, VehicleAvailabilityService availabilityService, NotificationPublisher notificationPublisher, AuthenticationService authenticationService, String notificationRecipient)
+    + FuelRecord updateFuelLevel(String vehicleId, int fuelLevel)
+    + FuelRecord updateFuelLevel( String vehicleId, int fuelLevel, LocalDate date)
+    + int getFuelLevel(String vehicleId)
+    - void sendFuelNotification(Vehicle vehicle, FuelRecord record)
+    - Vehicle findVehicle(String vehicleId)
+  }
+  class "MaintenanceService" as C49 {
+    - MAINTENANCE_INTERVAL_MONTHS : int
+    - REMINDER_DAYS_BEFORE : int
+    - vehicleRepository : VehicleRepository
+    - rentalRepository : RentalRepository
+    - maintenanceRepository : MaintenanceRepository
+    - incidentRepository : VehicleIncidentRepository
+    - notificationPublisher : NotificationPublisher
+    - authenticationService : AuthenticationService
+    - notificationRecipient : String
+    - availabilityService : VehicleAvailabilityService
+    --
+    + MaintenanceService( VehicleRepository vehicleRepository, RentalRepository rentalRepository, MaintenanceRepository maintenanceRepository, NotificationPublisher notificationPublisher, AuthenticationService authenticationService, String notificationRecipient)
+    + MaintenanceService( VehicleRepository vehicleRepository, RentalRepository rentalRepository, MaintenanceRepository maintenanceRepository, VehicleIncidentRepository incidentRepository, NotificationPublisher notificationPublisher, AuthenticationService authenticationService, String notificationRecipient)
+    + MaintenanceService( VehicleRepository vehicleRepository, RentalRepository rentalRepository, MaintenanceRepository maintenanceRepository, VehicleIncidentRepository incidentRepository, NotificationPublisher notificationPublisher, AuthenticationService authenticationService, String notificationRecipient, VehicleAvailabilityService availabilityService)
+    + MaintenanceRecord scheduleMaintenance( String vehicleId, LocalDate lastMaintenanceDate)
+    + int checkMaintenance(LocalDate today)
+    + MaintenanceRecord completeMaintenance( String vehicleId, LocalDate completionDate)
+    + List<MaintenanceRecord> getAllMaintenanceRecords()
+    - void markVehicleForMaintenance(String vehicleId)
+    - void updateVehicleStatusAfterMaintenance( Vehicle vehicle, LocalDate completionDate)
+    - void sendUpcomingMaintenanceNotification(MaintenanceRecord record)
+    - void sendDueMaintenanceNotification( MaintenanceRecord record, LocalDate today)
+    - Vehicle findVehicle(String vehicleId)
+    - void validateVehicleId(String vehicleId)
+  }
+  class "RentalService" as C50 {
+    - MAX_RENTAL_DAYS : int
+    - vehicleRepository : VehicleRepository
+    - rentalRepository : RentalRepository
+    - authenticationService : AuthenticationService
+    - maintenanceRepository : MaintenanceRepository
+    - fuelRepository : VehicleFuelRepository
+    - documentsRepository : VehicleDocumentsRepository
+    --
+    + RentalService(VehicleRepository vehicleRepository, RentalRepository rentalRepository, AuthenticationService authenticationService)
+    + RentalService(VehicleRepository vehicleRepository, RentalRepository rentalRepository, AuthenticationService authenticationService, MaintenanceRepository maintenanceRepository)
+    + RentalService(VehicleRepository vehicleRepository, RentalRepository rentalRepository, AuthenticationService authenticationService, MaintenanceRepository maintenanceRepository, VehicleFuelRepository fuelRepository, VehicleDocumentsRepository documentsRepository)
+    + Rental rentVehicle(String vehicleId, String customerName, String customerEmail, LocalDate startDate, LocalDate endDate)
+    + Rental rentVehicle(String vehicleId, String customerName, String customerEmail, int customerAge, boolean hasSpecialLicense, LocalDate startDate, LocalDate endDate)
+    - void validateMaintenanceSchedule(String vehicleId, LocalDate endDate)
+    - void validateFuelLevel(Vehicle vehicle)
+    - void validateVehicleDocuments(String vehicleId, LocalDate endDate)
+    - RentalValidationStrategy selectValidationStrategy(Vehicle vehicle)
+    - void validateVehicleId(String vehicleId)
+    - void validateCustomer(String customerName, String customerEmail, int customerAge)
+    - void validateRentalPeriod(LocalDate startDate, LocalDate endDate)
+  }
+  class "ReturnService" as C51 {
+    - rentalRepository : RentalRepository
+    - billingService : BillingService
+    - authenticationService : AuthenticationService
+    - maintenanceRepository : MaintenanceRepository
+    - vehicleRepository : VehicleRepository
+    - availabilityService : VehicleAvailabilityService
+    --
+    + ReturnService( RentalRepository rentalRepository, BillingService billingService, AuthenticationService authenticationService )
+    + ReturnService( RentalRepository rentalRepository, BillingService billingService, AuthenticationService authenticationService, MaintenanceRepository maintenanceRepository )
+    + ReturnService( RentalRepository rentalRepository, BillingService billingService, AuthenticationService authenticationService, MaintenanceRepository maintenanceRepository, VehicleRepository vehicleRepository )
+    + ReturnService( RentalRepository rentalRepository, BillingService billingService, AuthenticationService authenticationService, MaintenanceRepository maintenanceRepository, VehicleRepository vehicleRepository, VehicleAvailabilityService availabilityService )
+    + double returnVehicle(String rentalId, LocalDate actualReturnDate)
+    - void updateVehicleStatusAfterReturn( Vehicle vehicle, LocalDate actualReturnDate)
+    + Optional<Rental> findActiveRental(String rentalId)
+  }
+  class "VehicleAvailabilityService" as C52 {
+    - MINIMUM_BATTERY_LEVEL : int
+    - MINIMUM_FUEL_LEVEL : int
+    - rentalRepository : RentalRepository
+    - maintenanceRepository : MaintenanceRepository
+    - incidentRepository : VehicleIncidentRepository
+    - fuelRepository : VehicleFuelRepository
+    - documentsRepository : VehicleDocumentsRepository
+    --
+    + VehicleAvailabilityService( RentalRepository rentalRepository, MaintenanceRepository maintenanceRepository, VehicleIncidentRepository incidentRepository, VehicleFuelRepository fuelRepository, VehicleDocumentsRepository documentsRepository)
+    + VehicleStatus determineStatus(Vehicle vehicle, LocalDate date)
+    + VehicleStatus applyStatus(Vehicle vehicle, LocalDate date)
+  }
+  class "VehicleCatalogService" as C53 {
+    - vehicleRepository : VehicleRepository
+    - authenticationService : AuthenticationService
+    --
+    + VehicleCatalogService (VehicleRepository vehicleRepository, AuthenticationService authenticationService)
+    + List<Vehicle> getAvailableVehicles()
+    + List<Vehicle> getAllVehicles()
+  }
+  class "VehicleDocumentsService" as C54 {
+    - REMINDER_DAYS_BEFORE : int
+    - vehicleRepository : VehicleRepository
+    - documentsRepository : VehicleDocumentsRepository
+    - availabilityService : VehicleAvailabilityService
+    - notificationPublisher : NotificationPublisher
+    - authenticationService : AuthenticationService
+    - notificationRecipient : String
+    --
+    + VehicleDocumentsService( VehicleRepository vehicleRepository, VehicleDocumentsRepository documentsRepository, VehicleAvailabilityService availabilityService, NotificationPublisher notificationPublisher, AuthenticationService authenticationService, String notificationRecipient)
+    + VehicleDocuments updateDocuments( String vehicleId, LocalDate registrationExpiryDate, LocalDate insuranceExpiryDate)
+    + int checkDocuments(LocalDate today)
+    + VehicleDocuments getDocuments(String vehicleId)
+    - void sendRegistrationReminder(VehicleDocuments documents)
+    - void sendInsuranceReminder(VehicleDocuments documents)
+    - void sendRegistrationExpired(VehicleDocuments documents)
+    - void sendInsuranceExpired(VehicleDocuments documents)
+    - Vehicle findVehicle(String vehicleId)
+  }
+  class "VehicleHistoryService" as C55 {
+    - vehicleRepository : VehicleRepository
+    - rentalRepository : RentalRepository
+    - incidentRepository : VehicleIncidentRepository
+    - maintenanceRepository : MaintenanceRepository
+    - fuelRepository : VehicleFuelRepository
+    - documentsRepository : VehicleDocumentsRepository
+    - authenticationService : AuthenticationService
+    --
+    + VehicleHistoryService( VehicleRepository vehicleRepository, RentalRepository rentalRepository, VehicleIncidentRepository incidentRepository, MaintenanceRepository maintenanceRepository, VehicleFuelRepository fuelRepository, VehicleDocumentsRepository documentsRepository, AuthenticationService authenticationService)
+    + List<String> getVehicleHistory(String vehicleId)
+    - void addEnergyInformation(Vehicle vehicle, List<String> history)
+    - void addDocumentInformation(Vehicle vehicle, List<String> history)
+    - void addRentalHistory(Vehicle vehicle, List<String> history)
+    - void addIncidentHistory(Vehicle vehicle, List<String> history)
+    - void addMaintenanceHistory(Vehicle vehicle, List<String> history)
+    - Vehicle findVehicle(String vehicleId)
+  }
+  class "VehicleIncidentService" as C56 {
+    - vehicleRepository : VehicleRepository
+    - incidentRepository : VehicleIncidentRepository
+    - notificationPublisher : NotificationPublisher
+    - authenticationService : AuthenticationService
+    - rentalRepository : RentalRepository
+    - maintenanceRepository : MaintenanceRepository
+    - notificationRecipient : String
+    - availabilityService : VehicleAvailabilityService
+    --
+    + VehicleIncidentService( VehicleRepository vehicleRepository, VehicleIncidentRepository incidentRepository, NotificationPublisher notificationPublisher, AuthenticationService authenticationService, String notificationRecipient)
+    + VehicleIncidentService( VehicleRepository vehicleRepository, VehicleIncidentRepository incidentRepository, NotificationPublisher notificationPublisher, AuthenticationService authenticationService, RentalRepository rentalRepository, MaintenanceRepository maintenanceRepository, String notificationRecipient)
+    + VehicleIncidentService( VehicleRepository vehicleRepository, VehicleIncidentRepository incidentRepository, NotificationPublisher notificationPublisher, AuthenticationService authenticationService, RentalRepository rentalRepository, MaintenanceRepository maintenanceRepository, String notificationRecipient, VehicleAvailabilityService availabilityService)
+    + VehicleIncident recordIncident( String vehicleId, IncidentType type, LocalDate date, String description)
+    + int completeInspection( String vehicleId, LocalDate inspectionDate)
+    + List<VehicleIncident> getPendingAccidents(String vehicleId)
+    + List<VehicleIncident> getVehicleIncidents(String vehicleId)
+    + List<VehicleIncident> getAllIncidents()
+    - void updateVehicleStatusAfterInspection( Vehicle vehicle, LocalDate inspectionDate)
+    - void validateIncidentData( String vehicleId, IncidentType type, LocalDate date, String description)
+    - Vehicle findVehicle(String vehicleId)
+    - void validateVehicleId(String vehicleId)
+    - void sendIncidentNotification( Vehicle vehicle, VehicleIncident incident)
+  }
+  class "VehicleManagementService" as C57 {
+    - MINIMUM_BATTERY_LEVEL : int
+    - MINIMUM_FUEL_LEVEL : int
+    - vehicleRepository : VehicleRepository
+    - fuelRepository : VehicleFuelRepository
+    - authenticationService : AuthenticationService
+    --
+    + VehicleManagementService( VehicleRepository vehicleRepository, VehicleFuelRepository fuelRepository, AuthenticationService authenticationService)
+    + Vehicle addVehicle( String id, String type, String brand, String model, double dailyRate, int energyLevel)
+    - Vehicle createVehicle( String id, String type, String brand, String model, double dailyRate, int energyLevel)
+    - String requireText(String value, String fieldName)
+  }
+}
+
+C47 --> "1" C52
+C48 --> "1" C52
+C48 --> "1" C45
+C49 --> "1" C45
+C49 --> "1" C52
+C50 --> "1" C45
+C51 --> "1" C46
+C51 --> "1" C45
+C51 --> "1" C52
+C53 --> "1" C45
+C54 --> "1" C52
+C54 --> "1" C45
+C55 --> "1" C45
+C56 --> "1" C45
+C56 --> "1" C52
+C57 --> "1" C45
+
+@enduml

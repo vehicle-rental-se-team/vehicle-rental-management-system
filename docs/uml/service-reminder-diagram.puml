@@ -1,0 +1,35 @@
+@startuml
+title com.vehiclerental.service.reminder - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.service.reminder" {
+  class "ReminderResult" as C64 {
+    - remindersSent : int
+    --
+    + ReminderResult(int remindersSent)
+    + int getRemindersSent()
+    + boolean hasReminders()
+    + String getMessage()
+  }
+  class "RentalReminderService" as C65 {
+    - notificationPublisher : NotificationPublisher
+    --
+    + RentalReminderService(NotificationService notificationService)
+    + RentalReminderService(NotificationPublisher notificationPublisher)
+    + ReminderResult sendExpiryReminders(List<Rental> rentals, LocalDate today)
+    + ReminderResult sendOverdueReminders(List<Rental> rentals, LocalDate today)
+    + ReminderResult sendRentalNotifications(List<Rental> rentals, LocalDate today)
+    + boolean shouldSendReminder(Rental rental, LocalDate today)
+    + boolean shouldSendOverdueReminder(Rental rental, LocalDate today)
+    + long calculateOverdueDays(Rental rental, LocalDate today)
+    - String buildReminderMessage(Rental rental)
+    - String buildOverdueMessage(Rental rental, long overdueDays)
+    - void validateInputs(List<Rental> rentals, LocalDate today)
+    - NotificationPublisher createPublisher(NotificationService notificationService)
+  }
+}
+
+@enduml

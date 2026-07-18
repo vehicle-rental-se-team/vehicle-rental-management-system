@@ -1,0 +1,30 @@
+@startuml
+title Vehicle Rental Management System - Package Overview
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "presentation" as presentation
+package "presentation.gui" as gui
+package "service" as service
+package "service.notification" as notification
+package "service.reminder" as reminder
+package "strategy" as strategy
+package "repository" as repository
+package "domain" as domain
+package "exception" as exception
+
+gui --> presentation
+presentation --> service
+gui --> service
+service --> repository
+service --> domain
+service --> strategy
+service --> notification
+service --> reminder
+repository --> domain
+strategy --> domain
+notification --> domain
+reminder --> service
+service --> exception
+
+@enduml

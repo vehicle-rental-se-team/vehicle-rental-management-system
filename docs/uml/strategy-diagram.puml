@@ -1,0 +1,37 @@
+@startuml
+title com.vehiclerental.strategy - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.strategy" {
+  class "ElectricVehicleValidationStrategy" as C66 {
+    - MINIMUM_BATTERY_LEVEL : int
+  }
+  class "MotorcycleValidationStrategy" as C67 {
+    - MINIMUM_AGE : int
+  }
+  class "RentalRequest" as C68 {
+    - customerAge : int
+    - hasSpecialLicense : boolean
+    --
+    + RentalRequest(int customerAge, boolean hasSpecialLicense)
+    + int getCustomerAge()
+    + boolean hasSpecialLicense()
+  }
+  interface "RentalValidationStrategy" as C69 {
+    ~ void validate(Vehicle vehicle, RentalRequest request)
+  }
+  class "StandardValidationStrategy" as C70 {
+  }
+  class "TruckValidationStrategy" as C71 {
+  }
+}
+
+C69 <|.. C66
+C69 <|.. C67
+C69 <|.. C70
+C69 <|.. C71
+
+@enduml

@@ -1,0 +1,170 @@
+@startuml
+title com.vehiclerental.domain - Complete Class Diagram
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide circle
+
+package "com.vehiclerental.domain" {
+  class "Car" as C1 {
+    + Car(String id, String brand, String model, double dailyRate, VehicleStatus status)
+  }
+  class "Customer" as C2 {
+    - id : String
+    - name : String
+    - email : String
+    --
+    + Customer(String id, String name, String email)
+    + String getId()
+    + String getName()
+    + String getEmail()
+  }
+  class "ElectricVehicle" as C3 {
+    - batteryLevel : int
+    --
+    + ElectricVehicle(String id, String brand, String model, double dailyRate, VehicleStatus status, int batteryLevel)
+    + int getBatteryLevel()
+    + void setBatteryLevel(int batteryLevel)
+  }
+  class "FuelRecord" as C4 {
+    - vehicleId : String
+    - fuelLevel : int
+    --
+    + FuelRecord(String vehicleId, int fuelLevel)
+    + String getVehicleId()
+    + int getFuelLevel()
+    + void setFuelLevel(int fuelLevel)
+    - void validateFuelLevel(int fuelLevel)
+  }
+  enum "IncidentType" as C5 {
+    ACCIDENT
+    VIOLATION
+  }
+  class "MaintenanceRecord" as C6 {
+    - id : String
+    - vehicleId : String
+    - lastMaintenanceDate : LocalDate
+    - nextMaintenanceDate : LocalDate
+    - status : MaintenanceStatus
+    --
+    + MaintenanceRecord( String id, String vehicleId, LocalDate lastMaintenanceDate, LocalDate nextMaintenanceDate, MaintenanceStatus status)
+    + String getId()
+    + String getVehicleId()
+    + LocalDate getLastMaintenanceDate()
+    + LocalDate getNextMaintenanceDate()
+    + MaintenanceStatus getStatus()
+    + void complete()
+    + boolean isPending()
+  }
+  enum "MaintenanceStatus" as C7 {
+    PENDING
+    COMPLETED
+  }
+  class "Manager" as C8 {
+    - username : String
+    - password : String
+    --
+    + Manager(String username, String password)
+    + String getUsername()
+    + String getPassword()
+  }
+  class "Motorcycle" as C9 {
+    + Motorcycle(String id, String brand, String model, double dailyRate, VehicleStatus status)
+  }
+  class "Rental" as C10 {
+    - id : String
+    - vehicle : Vehicle
+    - customer : Customer
+    - startDate : LocalDate
+    - endDate : LocalDate
+    - active : boolean
+    --
+    + Rental(String id, Vehicle vehicle, Customer customer, LocalDate startDate, LocalDate endDate)
+    + Rental(String id, Vehicle vehicle, Customer customer, LocalDate startDate, LocalDate endDate, boolean active)
+    + String getId()
+    + Vehicle getVehicle()
+    + Customer getCustomer()
+    + String getCustomerName()
+    + String getCustomerEmail()
+    + LocalDate getStartDate()
+    + LocalDate getEndDate()
+    + long getRentalDays()
+    + boolean isActive()
+    + boolean isReturned()
+    + void close()
+  }
+  class "Truck" as C11 {
+    + Truck(String id, String brand, String model, double dailyRate, VehicleStatus status)
+  }
+  class "Van" as C12 {
+    + Van(String id, String brand, String model, double dailyRate, VehicleStatus status)
+  }
+  class "Vehicle" as C13 {
+    - id : String
+    - brand : String
+    - model : String
+    - dailyRate : double
+    - status : VehicleStatus
+    --
+    + Vehicle( String id, String brand, String model, double dailyRate, VehicleStatus status)
+    + String getId()
+    + String getBrand()
+    + String getModel()
+    + double getDailyRate()
+    + VehicleStatus getStatus()
+    + void setStatus(VehicleStatus status)
+    + boolean isAvailable()
+    + String getType()
+  }
+  class "VehicleDocuments" as C14 {
+    - vehicleId : String
+    - registrationExpiryDate : LocalDate
+    - insuranceExpiryDate : LocalDate
+    --
+    + VehicleDocuments( String vehicleId, LocalDate registrationExpiryDate, LocalDate insuranceExpiryDate)
+    + String getVehicleId()
+    + LocalDate getRegistrationExpiryDate()
+    + LocalDate getInsuranceExpiryDate()
+    + void updateDates( LocalDate registrationExpiryDate, LocalDate insuranceExpiryDate)
+    + boolean isRegistrationExpired(LocalDate date)
+    + boolean isInsuranceExpired(LocalDate date)
+  }
+  class "VehicleIncident" as C15 {
+    - id : String
+    - vehicleId : String
+    - type : IncidentType
+    - date : LocalDate
+    - description : String
+    - inspectionCompleted : boolean
+    --
+    + VehicleIncident( String id, String vehicleId, IncidentType type, LocalDate date, String description)
+    + VehicleIncident( String id, String vehicleId, IncidentType type, LocalDate date, String description, boolean inspectionCompleted)
+    + String getId()
+    + String getVehicleId()
+    + IncidentType getType()
+    + LocalDate getDate()
+    + String getDescription()
+    + boolean isInspectionCompleted()
+    + boolean requiresInspection()
+    + void completeInspection()
+  }
+  enum "VehicleStatus" as C16 {
+    AVAILABLE
+    RENTED
+    MAINTENANCE
+    UNAVAILABLE
+  }
+}
+
+C13 <|-- C1
+C13 <|-- C3
+C13 <|-- C9
+C13 <|-- C11
+C13 <|-- C12
+C6 --> "1" C7
+C10 --> "1" C13
+C10 --> "1" C2
+C13 --> "1" C16
+C15 --> "1" C5
+
+@enduml

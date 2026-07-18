@@ -27,23 +27,48 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+/**
+ * Handles the main steps needed to create a vehicle rental.
+ */
 public class RentalService {
 
+    /** Maximum number of days allowed for one rental. */
     private static final int MAX_RENTAL_DAYS = 30;
 
+    /** Repository used to read and update vehicles. */
     private final VehicleRepository vehicleRepository;
+    /** Repository used to save and search rentals. */
     private final RentalRepository rentalRepository;
+    /** Service used to make sure a user is logged in. */
     private final AuthenticationService authenticationService;
+    /** Repository used to check vehicle maintenance dates. */
     private final MaintenanceRepository maintenanceRepository;
+    /** Repository used to check the fuel level. */
     private final VehicleFuelRepository fuelRepository;
+    /** Repository used to check registration and insurance dates. */
     private final VehicleDocumentsRepository documentsRepository;
 
+    /**
+     * Creates the service with the basic repositories.
+     *
+     * @param vehicleRepository the vehicle repository
+     * @param rentalRepository the rental repository
+     * @param authenticationService the authentication service
+     */
     public RentalService(VehicleRepository vehicleRepository,
                          RentalRepository rentalRepository,
                          AuthenticationService authenticationService) {
         this(vehicleRepository, rentalRepository, authenticationService, null, null, null);
     }
 
+    /**
+     * Creates the service with maintenance checking.
+     *
+     * @param vehicleRepository the vehicle repository
+     * @param rentalRepository the rental repository
+     * @param authenticationService the authentication service
+     * @param maintenanceRepository the maintenance repository
+     */
     public RentalService(VehicleRepository vehicleRepository,
                          RentalRepository rentalRepository,
                          AuthenticationService authenticationService,
@@ -51,6 +76,16 @@ public class RentalService {
         this(vehicleRepository, rentalRepository, authenticationService, maintenanceRepository, null, null);
     }
 
+    /**
+     * Creates the service with all rental validation repositories.
+     *
+     * @param vehicleRepository the vehicle repository
+     * @param rentalRepository the rental repository
+     * @param authenticationService the authentication service
+     * @param maintenanceRepository the maintenance repository
+     * @param fuelRepository the fuel repository
+     * @param documentsRepository the vehicle documents repository
+     */
     public RentalService(VehicleRepository vehicleRepository,
                          RentalRepository rentalRepository,
                          AuthenticationService authenticationService,
@@ -65,6 +100,16 @@ public class RentalService {
         this.documentsRepository = documentsRepository;
     }
 
+    /**
+     * Rents a vehicle using the default customer age and license values.
+     *
+     * @param vehicleId the selected vehicle id
+     * @param customerName the customer name
+     * @param customerEmail the customer email
+     * @param startDate the rental start date
+     * @param endDate the rental end date
+     * @return the created rental
+     */
     public Rental rentVehicle(String vehicleId,
                               String customerName,
                               String customerEmail,
@@ -73,6 +118,18 @@ public class RentalService {
         return rentVehicle(vehicleId, customerName, customerEmail, 18, false, startDate, endDate);
     }
 
+    /**
+     * Validates the request and creates a new rental.
+     *
+     * @param vehicleId the selected vehicle id
+     * @param customerName the customer name
+     * @param customerEmail the customer email
+     * @param customerAge the customer age
+     * @param hasSpecialLicense true when the customer has a special license
+     * @param startDate the rental start date
+     * @param endDate the rental end date
+     * @return the created rental
+     */
     public Rental rentVehicle(String vehicleId,
                               String customerName,
                               String customerEmail,
@@ -124,6 +181,12 @@ public class RentalService {
         return rental;
     }
 
+    /**
+     * Checks that the rental does not conflict with maintenance.
+     *
+     * @param vehicleId the vehicle id
+     * @param endDate the rental end date
+     */
     private void validateMaintenanceSchedule(String vehicleId, LocalDate endDate) {
         if (maintenanceRepository == null) {
             return;
@@ -140,6 +203,11 @@ public class RentalService {
                 });
     }
 
+    /**
+     * Checks that a non-electric vehicle has enough fuel.
+     *
+     * @param vehicle the vehicle being rented
+     */
     private void validateFuelLevel(Vehicle vehicle) {
         if (fuelRepository == null || vehicle instanceof ElectricVehicle) {
             return;
@@ -154,6 +222,12 @@ public class RentalService {
                 });
     }
 
+    /**
+     * Checks that registration and insurance stay valid during the rental.
+     *
+     * @param vehicleId the vehicle id
+     * @param endDate the rental end date
+     */
     private void validateVehicleDocuments(String vehicleId, LocalDate endDate) {
         if (documentsRepository == null) {
             return;
@@ -174,6 +248,12 @@ public class RentalService {
                 });
     }
 
+    /**
+     * Selects the validation strategy based on vehicle type.
+     *
+     * @param vehicle the vehicle being rented
+     * @return the matching validation strategy
+     */
     private RentalValidationStrategy selectValidationStrategy(Vehicle vehicle) {
         if (vehicle instanceof Truck) {
             return new TruckValidationStrategy();
@@ -187,12 +267,24 @@ public class RentalService {
         return new StandardValidationStrategy();
     }
 
+    /**
+     * Checks that the vehicle id is not empty.
+     *
+     * @param vehicleId the vehicle id
+     */
     private void validateVehicleId(String vehicleId) {
         if (vehicleId == null || vehicleId.trim().isEmpty()) {
             throw new IllegalArgumentException("Vehicle id is required.");
         }
     }
 
+    /**
+     * Checks the customer name, email, and age.
+     *
+     * @param customerName the customer name
+     * @param customerEmail the customer email
+     * @param customerAge the customer age
+     */
     private void validateCustomer(String customerName, String customerEmail, int customerAge) {
         if (customerName == null || customerName.trim().isEmpty()) {
             throw new IllegalArgumentException("Customer name is required.");
@@ -208,6 +300,12 @@ public class RentalService {
         }
     }
 
+    /**
+     * Checks that the rental dates are valid and within the allowed limit.
+     *
+     * @param startDate the rental start date
+     * @param endDate the rental end date
+     */
     private void validateRentalPeriod(LocalDate startDate, LocalDate endDate) {
         if (startDate == null || endDate == null) {
             throw new InvalidRentalPeriodException("Start date and end date are required.");
