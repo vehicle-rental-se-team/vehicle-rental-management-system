@@ -16,7 +16,7 @@ import javax.swing.table.TableRowSorter;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.List;
-
+import java.util.regex.Pattern;
 public class VehicleCatalogPanel extends JPanel implements RefreshablePanel {
 
     private final AppContext appContext;
@@ -110,7 +110,7 @@ public class VehicleCatalogPanel extends JPanel implements RefreshablePanel {
         if (keyword.isEmpty()) {
             sorter.setRowFilter(null);
         } else {
-            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + keyword));
+            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + Pattern.quote(keyword)));
         }
     }
 

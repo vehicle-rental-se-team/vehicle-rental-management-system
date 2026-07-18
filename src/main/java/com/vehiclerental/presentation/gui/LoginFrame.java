@@ -65,7 +65,7 @@ public class LoginFrame extends JFrame {
 
         gbc.gridy++;
         gbc.insets = new Insets(30, 38, 8, 38);
-        JLabel sprint = new JLabel("Sprint 1 Ready");
+        JLabel sprint = new JLabel("Complete Project");
         sprint.setOpaque(true);
         sprint.setBackground(UiTheme.PRIMARY);
         sprint.setForeground(Color.BLACK);
@@ -75,7 +75,7 @@ public class LoginFrame extends JFrame {
 
         gbc.gridy++;
         gbc.insets = new Insets(16, 38, 0, 38);
-        JLabel details = new JLabel("Login, logout, and available vehicle catalog.");
+        JLabel details = new JLabel("Vehicle Rental Management System - Sprints 1 to 5");
         details.setForeground(UiTheme.MUTED);
         details.setFont(new Font("SansSerif", Font.PLAIN, 13));
         panel.add(details, gbc);
