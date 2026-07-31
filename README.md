@@ -6,6 +6,15 @@ The Vehicle Rental Management System is a Java desktop application that helps a 
 
 The project was developed as a team project using Java, Swing, Maven, JUnit 5, Mockito, and JaCoCo. The code is divided into clear layers so that each part of the system has a specific responsibility.
 
+
+## Repository
+
+GitHub repository:
+
+```text
+https://github.com/vehicle-rental-se-team/vehicle-rental-management-system
+```
+
 ## Main Features
 
 The system provides the following features:
@@ -96,7 +105,7 @@ Main classes:
 - `EmailNotificationObserver`
 - `NotificationLogObserver`
 
-The current email notification service simulates sending an email by printing the message and saving it in the notification log.
+The current email notification service simulates sending an email using Java logging, while notification observers can also keep messages in the notification log.
 
 ## How to Run the Project
 
@@ -161,6 +170,19 @@ target/site/jacoco/index.html
 ```
 
 The presentation package is excluded from JaCoCo because Swing GUI classes are tested manually, while the main business logic is covered by unit tests.
+
+
+## Phase 2 Quality Results
+
+- GitHub Actions CI/CD: configured and passing on the `main` branch.
+- SonarQube Cloud Quality Gate: **Passed**.
+- Unit tests: **282 tests**, with **0 failures** and **0 errors**.
+- JaCoCo instruction coverage: approximately **95%**.
+- JaCoCo branch coverage: approximately **88%**.
+- SonarQube New Code Coverage after the coverage fix: **100%**.
+- SonarQube New Code Duplications: **0.0%**.
+
+The Swing presentation package is excluded from automated coverage because GUI behavior is checked manually, while domain, repository, service, strategy, notification, and reminder logic are covered by unit tests.
 
 ## Javadoc Documentation
 

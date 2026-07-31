@@ -46,6 +46,7 @@ package "com.vehiclerental.service" {
   }
   class "FuelMonitoringService" as C48 {
     - LOW_FUEL_LEVEL : int
+    - APPLICATION_ZONE : ZoneId
     - vehicleRepository : VehicleRepository
     - fuelRepository : VehicleFuelRepository
     - availabilityService : VehicleAvailabilityService

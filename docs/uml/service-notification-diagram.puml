@@ -12,6 +12,9 @@ package "com.vehiclerental.service.notification" {
     + EmailNotificationObserver(NotificationService notificationService)
   }
   class "EmailNotificationService" as C59 {
+    - LOGGER : Logger
+    --
+    + void sendNotification(String recipient, String message)
   }
   class "NotificationLogObserver" as C60 {
     - List<String> messages = new ArrayList<>()
