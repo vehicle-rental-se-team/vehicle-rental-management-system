@@ -98,7 +98,7 @@ public class VehicleFuelRepository {
             }
         } catch (IOException exception) {
             throw new IllegalStateException(
-                    "Could not create fuel file.",
+                    "Could not load fuel data.",
                     exception
             );
         }
@@ -112,7 +112,7 @@ public class VehicleFuelRepository {
             }
         } catch (IOException exception) {
             throw new IllegalStateException(
-                    "Could not create fuel file.",
+                    "Could not save fuel data.",
                     exception
             );
         }
