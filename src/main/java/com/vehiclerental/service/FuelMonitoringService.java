@@ -6,13 +6,14 @@ import com.vehiclerental.domain.Vehicle;
 import com.vehiclerental.repository.VehicleFuelRepository;
 import com.vehiclerental.repository.VehicleRepository;
 import com.vehiclerental.service.notification.NotificationPublisher;
+import java.time.ZoneId;
 
 import java.time.LocalDate;
 
 public class FuelMonitoringService {
 
     private static final int LOW_FUEL_LEVEL = 20;
-
+    private static final ZoneId APPLICATION_ZONE = ZoneId.systemDefault();
     private final VehicleRepository vehicleRepository;
     private final VehicleFuelRepository fuelRepository;
     private final VehicleAvailabilityService availabilityService;
@@ -48,7 +49,11 @@ public class FuelMonitoringService {
     }
 
     public FuelRecord updateFuelLevel(String vehicleId, int fuelLevel) {
-        return updateFuelLevel(vehicleId, fuelLevel, LocalDate.now());
+        return updateFuelLevel(
+                vehicleId,
+                fuelLevel,
+                LocalDate.now(APPLICATION_ZONE)
+        );
     }
 
     public FuelRecord updateFuelLevel(
