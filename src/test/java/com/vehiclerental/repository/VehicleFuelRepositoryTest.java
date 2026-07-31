@@ -89,4 +89,70 @@ class VehicleFuelRepositoryTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new VehicleFuelRepository(file.toString()));
     }
+    @Test
+    void shouldThrowIllegalStateWhenFuelFileCannotBeCreated()
+            throws IOException {
+
+        Path blockingParent =
+                tempDirectory.resolve("blocking-parent");
+
+        Files.write(
+                blockingParent,
+                Arrays.asList("not a directory"),
+                StandardCharsets.UTF_8
+        );
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> new VehicleFuelRepository(
+                        blockingParent.resolve("fuel.txt").toString()
+                )
+        );
+
+        assertEquals(
+                "Could not create fuel file.",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void shouldThrowIllegalStateWhenFuelDataCannotBeLoaded() {
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> new VehicleFuelRepository(
+                        tempDirectory.toString()
+                )
+        );
+
+        assertEquals(
+                "Could not load fuel data.",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void shouldThrowIllegalStateWhenFuelDataCannotBeSaved()
+            throws IOException {
+
+        Path file = tempDirectory.resolve("fuel.txt");
+
+        VehicleFuelRepository repository =
+                new VehicleFuelRepository(file.toString());
+
+        Files.delete(file);
+        Files.createDirectory(file);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> repository.saveOrUpdate(
+                        new FuelRecord("V1", 80)
+                )
+        );
+
+        assertEquals(
+                "Could not save fuel data.",
+                exception.getMessage()
+        );
+    }
 }
