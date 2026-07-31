@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - phase2-sonar
+
   pull_request:
     branches:
       - main
