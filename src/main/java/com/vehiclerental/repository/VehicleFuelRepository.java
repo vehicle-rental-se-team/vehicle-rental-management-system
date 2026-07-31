@@ -71,7 +71,10 @@ public class VehicleFuelRepository {
                 file.createNewFile();
             }
         } catch (IOException exception) {
-            throw new RuntimeException("Could not create fuel file.", exception);
+            throw new IllegalStateException(
+                    "Could not create fuel file.",
+                    exception
+            );
         }
     }
 
@@ -94,7 +97,10 @@ public class VehicleFuelRepository {
                 }
             }
         } catch (IOException exception) {
-            throw new RuntimeException("Could not load fuel data.", exception);
+            throw new IllegalStateException(
+                    "Could not create fuel file.",
+                    exception
+            );
         }
     }
 
@@ -105,7 +111,10 @@ public class VehicleFuelRepository {
                 writer.newLine();
             }
         } catch (IOException exception) {
-            throw new RuntimeException("Could not save fuel data.", exception);
+            throw new IllegalStateException(
+                    "Could not create fuel file.",
+                    exception
+            );
         }
     }
 }
